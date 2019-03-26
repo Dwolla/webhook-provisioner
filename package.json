@@ -1,0 +1,44 @@
+{
+  "name": "webhook-provisioner",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "sls webpack",
+    "build:stack": "cd scripts && tsc && cdk synth Stack --app 'node stack.js' --no-version-reporting --strict > stack.yml",
+    "build:docker": "npm run build && cp Dockerfile .dockerignore .webpack/service",
+    "clean": "skripts clean scripts --pattern '*.js'",
+    "deploy": "npm run build:stack && sls deploy",
+    "deploy:docker": "npm run build:docker && cd .webpack/service && skripts docker-publish docker.dwolla.net/dwolla/webhook-provisioner --tag $(git rev-parse HEAD)",
+    "format": "skripts prettier",
+    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket skripts jest",
+    "lint": "skripts tslint",
+    "start": "npm run build && cd .webpack/service && node server.js",
+    "test": "npm run lint && npm run build:stack && npm run jest && sls package",
+    "watch": "npm run jest -- --watch"
+  },
+  "dependencies": {
+    "@therockstorm/utils": "^3.0.3",
+    "async-retry": "^1.2.3",
+    "aws-sdk": "^2.427.0",
+    "axios": "^0.18.0",
+    "p-limit": "^2.2.0",
+    "source-map-support": "^0.5.11"
+  },
+  "devDependencies": {
+    "@aws-cdk/aws-cloudwatch": "^0.26.0",
+    "@aws-cdk/aws-logs": "^0.26.0",
+    "@aws-cdk/aws-sqs": "^0.26.0",
+    "@aws-cdk/cdk": "^0.26.0",
+    "@types/async-retry": "^1.2.1",
+    "aws-cdk": "^0.26.0",
+    "husky": "^1.3.1",
+    "serverless-pseudo-parameters": "^2.4.0",
+    "skripts": "0.0.11",
+    "tslint": "^5.14.0",
+    "typescript": "^3.3.4000"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "skripts pre-commit"
+    }
+  }
+}

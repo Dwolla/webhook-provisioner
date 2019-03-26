@@ -1,0 +1,10 @@
+.DS_Store
+event.json
+scripts/*.js
+stack.yml
+
+.idea/
+.serverless/
+.vscode/
+.webpack/
+node_modules/
