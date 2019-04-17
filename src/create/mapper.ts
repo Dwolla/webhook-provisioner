@@ -152,7 +152,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
   },
   FunctionName: lambdaName(req.cId),
   Handler: "src/handler.handle",
-  MemorySize: 128,
+  MemorySize: 256,
   Publish: true,
   Role: req.role.roleArn,
   Runtime: "nodejs8.10",

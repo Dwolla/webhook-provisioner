@@ -1,4 +1,4 @@
-import { Concurrency } from "../src"
+import { IConcurrency } from "../src"
 import {
   calculateFuncTimeout,
   ignore404,
@@ -7,13 +7,13 @@ import {
 } from "../src/util"
 
 describe("validateConcurrency", () => {
-  const con = (concur: Concurrency, expReserve: number, expPost: number) => {
+  const con = (concur: IConcurrency, expReserve: number, expPost: number) => {
     const c = validateConcurrency(concur)
     expect(c.reserved).toBe(expReserve)
     expect(c.post).toBe(expPost)
   }
 
-  it("default if undefined", () => con({} as Concurrency, 2, 5))
+  it("default if undefined", () => con({} as IConcurrency, 2, 5))
   it("set to minimum if 0", () => con({ reserved: 0, post: 0 }, 1, 1))
   it("set to max if too high", () => con({ reserved: 11, post: 11 }, 10, 10))
   it("return what was passed", () => con({ reserved: 8, post: 8 }, 8, 8))
