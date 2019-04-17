@@ -4,8 +4,8 @@ import {
   Metric
 } from "@aws-cdk/aws-cloudwatch"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
-import { CfnQueue, Queue } from "@aws-cdk/aws-sqs"
-import { App, Stack, StackProps } from "@aws-cdk/cdk"
+import { Queue } from "@aws-cdk/aws-sqs"
+import { App, Stack, StackProps, Tag } from "@aws-cdk/cdk"
 import { envVar, error } from "@therockstorm/utils"
 import SNS from "aws-sdk/clients/sns"
 import { name } from "../package.json"
@@ -82,27 +82,11 @@ class MyStack extends Stack {
     const ref = `${capped}Queue`
 
     const queue = () => {
-      const q = new Queue(this, ref, {
+      new Queue(this, ref, { // tslint:disable-line
         queueName,
         retentionPeriodSec: 1209600,
         visibilityTimeoutSec: 180
       })
-      const resource = q.node.findChild("Resource") as CfnQueue
-      const tags = [
-        { key: "Environment", value: ENV },
-        { key: "Project", value: PROJECT },
-        { key: "Creator", value: "serverless" },
-        { key: "Team", value: "growth" },
-        { key: "Visibility", value: "external" }
-      ]
-      if (BUILD_URL) tags.push({ key: "DeployJobUrl", value: BUILD_URL })
-      if (GIT_URL) {
-        tags.push({ key: "org.label-schema.vcs-url", value: GIT_URL })
-      }
-      if (GIT_COMMIT) {
-        tags.push({ key: "org.label-schema.vcs-ref", value: GIT_COMMIT })
-      }
-      resource.propertyOverrides.tags = tags
     }
 
     queue()
@@ -180,7 +164,19 @@ const create = async () => {
     error({ code: e.code, message: e.message })
   }
   const app = new App()
-  new MyStack(app, "Stack", arn) // tslint:disable-line
+  const stack = new MyStack(app, "Stack", arn)
+  stack.node.apply(new Tag("Environment", ENV))
+  stack.node.apply(new Tag("Project", PROJECT))
+  stack.node.apply(new Tag("Creator", "serverless"))
+  stack.node.apply(new Tag("Team", "growth"))
+  stack.node.apply(new Tag("Visibility", "external"))
+  if (BUILD_URL) stack.node.apply(new Tag("DeployJobUrl", BUILD_URL))
+  if (GIT_URL) {
+    stack.node.apply(new Tag("org.label-schema.vcs-url", GIT_URL))
+  }
+  if (GIT_COMMIT) {
+    stack.node.apply(new Tag("org.label-schema.vcs-ref", GIT_COMMIT))
+  }
   app.run()
 }
 

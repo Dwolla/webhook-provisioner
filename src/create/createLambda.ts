@@ -1,6 +1,6 @@
 import { log } from "@therockstorm/utils"
 import Lambda from "aws-sdk/clients/lambda"
-import { CreateFuncReq, Func } from ".."
+import { CreateFuncReq, IFunc } from ".."
 import { logRes, retry } from "../util"
 import {
   toCreateEventSourceMapping,
@@ -10,8 +10,8 @@ import {
 
 const lam = new Lambda()
 
-export const createLambda = async (req: CreateFuncReq): Promise<Func> =>
-  await logRes<Func>("Creating lambda", async () => {
+export const createLambda = async (req: CreateFuncReq): Promise<IFunc> =>
+  await logRes<IFunc>("Creating lambda", async () => {
     const r = await retry(async () =>
       lam.createFunction(toCreateFunc(req)).promise()
     )

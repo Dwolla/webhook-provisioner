@@ -4,13 +4,13 @@ export interface IEvent {
   consumerId: ConsumerId
 }
 
-export interface Concurrency {
+export interface IConcurrency {
   reserved: number
   post: number
 }
 
 export interface IConcurrencyEvent extends IEvent {
-  concurrency: Concurrency
+  concurrency: IConcurrency
 }
 
 export interface IDisableEvent extends IEvent {
@@ -19,7 +19,7 @@ export interface IDisableEvent extends IEvent {
 
 export interface IUpdateEvent {
   consumerIds: ConsumerId[]
-  concurrency: Concurrency
+  concurrency: IConcurrency
 }
 
 export type Res = Readonly<{
@@ -45,14 +45,14 @@ export type Role = Readonly<{
 
 export type CreateFuncReq = Readonly<{
   cId: ConsumerId
-  concurrency: Concurrency
+  concurrency: IConcurrency
   location: Location
   queues: Queues
   role: Role
   timeout: number
 }>
 
-export interface Func {
+export interface IFunc {
   arn: string
   eventSourceId?: string
 }

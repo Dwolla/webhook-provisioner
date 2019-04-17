@@ -1,7 +1,7 @@
 import { envVar, error, log, thrw, warn } from "@therockstorm/utils"
 import asyncRetry from "async-retry"
 import { AWSError } from "aws-sdk"
-import { Concurrency, Res } from "."
+import { IConcurrency, Res } from "."
 import { toRes } from "./mapper"
 
 export const BATCH = 10
@@ -13,7 +13,7 @@ const HTTP_TIMEOUT = 10
 const QUEUE_SEND_TIMEOUT = 5
 const MISC_TIMEOUT = 2
 
-export const validateConcurrency = (con: Concurrency) => {
+export const validateConcurrency = (con: IConcurrency) => {
   con.reserved = validate(con.reserved, 1, 10, 2)
   con.post = validate(con.post, 1, BATCH, 5)
   return con

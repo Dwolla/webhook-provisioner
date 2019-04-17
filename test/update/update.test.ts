@@ -50,8 +50,8 @@ test("update", async () => {
   expect(queueName).toHaveBeenCalledWith(evt.consumerIds[0])
   expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
   expect(setQueueAttributes).toHaveBeenCalledWith({
-    QueueUrl: qu,
-    Attributes: { VisibilityTimeout: "192" }
+    Attributes: { VisibilityTimeout: "192" },
+    QueueUrl: qu
   })
   expect(getFunctionConfiguration).toHaveBeenCalledWith({ FunctionName: ln })
   expect(putFunctionConcurrency).toHaveBeenCalledWith({

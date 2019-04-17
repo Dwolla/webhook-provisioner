@@ -5,7 +5,7 @@ import Lambda, {
   FunctionList
 } from "aws-sdk/clients/lambda"
 import pLimit from "p-limit"
-import { Func, Location } from ".."
+import { IFunc, Location } from ".."
 import { latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
 
@@ -15,7 +15,7 @@ const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
 
-export const updateAll = async (): Promise<Func[]> => {
+export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFuncs()])
   const [upd, notUpd] = partition(
     fns,
@@ -24,7 +24,7 @@ export const updateAll = async (): Promise<Func[]> => {
   if (notUpd.length) log(`Not updating ${notUpd.map(f => f.name).join(", ")}`)
 
   const res = await Promise.all(
-    upd.map(f => limit<any, Func>(() => update(f, lc)))
+    upd.map(f => limit<any, IFunc>(() => update(f, lc)))
   )
   log("Complete")
   return res
@@ -64,7 +64,7 @@ function partition<T>(as: T[], pred: (a: T) => boolean) {
   )
 }
 
-const update = async (f: Fn, lc: Location): Promise<Func> =>
+const update = async (f: Fn, lc: Location): Promise<IFunc> =>
   await logRes(`Updating ${f.name}`, async () => {
     await lam
       .updateFunctionCode({
@@ -78,6 +78,7 @@ const update = async (f: Fn, lc: Location): Promise<Func> =>
       .updateFunctionConfiguration({
         Environment: { Variables: { ...f.vars, VERSION: lc.version } },
         FunctionName: f.name,
+        MemorySize: 256,
         Timeout: calculateFuncTimeout(f.vars.CONCURRENCY)
       })
       .promise()).FunctionArn as string
