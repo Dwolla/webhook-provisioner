@@ -219,7 +219,7 @@ test("toCreateFunc", () => {
     MemorySize: 256,
     Publish: true,
     Role: req.role.roleArn,
-    Runtime: "nodejs8.10",
+    Runtime: "nodejs10.x",
     Tags: TAGS,
     Timeout: req.timeout
   })
