@@ -1,3 +1,4 @@
 module.exports = {
-  packageIndividually: () => process.env.ENVIRONMENT !== "local"
+  // False until this is resolved: https://github.com/serverless-heaven/serverless-webpack/issues/299
+  packageIndividually: () => false //process.env.ENVIRONMENT !== "local"
 }
