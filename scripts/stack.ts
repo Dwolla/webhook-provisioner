@@ -82,7 +82,8 @@ class MyStack extends Stack {
     const ref = `${capped}Queue`
 
     const queue = () => {
-      new Queue(this, ref, { // tslint:disable-line
+      new Queue(this, ref, {
+        // tslint:disable-line
         queueName,
         retentionPeriodSec: 1209600,
         visibilityTimeoutSec: 180
@@ -109,9 +110,11 @@ class MyStack extends Stack {
     const namespace = "LogMetrics"
 
     const errorFilter = () => {
-      const logGroup = LogGroup.import(this, `${capped}LogGroup`, {
-        logGroupArn: `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`
-      })
+      const logGroup = LogGroup.fromLogGroupArn(
+        this,
+        `${capped}LogGroup`,
+        `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`
+      )
       const filter = logGroup.newMetricFilter(this, `${ref}ErrorFilter`, {
         filterPattern: { logPatternString: '"[error]"' },
         metricName,
