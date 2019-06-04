@@ -154,7 +154,7 @@ class MyStack extends Stack {
         statistic: props.statistic || "Sum",
         threshold: props.threshold || 1
       })
-      .onAlarm({ alarmActionArn: this.topicArn })
+      .addAlarmAction({ alarmActionArn: this.topicArn })
 }
 
 const create = async () => {
