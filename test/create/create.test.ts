@@ -11,6 +11,7 @@ jest.mock("../../src/create/createQueue")
 jest.mock("../../src/create/createLambda")
 jest.mock("../../src/create/createLogGroup")
 jest.mock("../../src/create/createRole")
+jest.mock("../../src/create/enableExisting")
 const latestCode = lc.latestCode as jest.Mock
 const createAlarms = ca.createAlarms as jest.Mock
 const createQueue = cq.createQueue as jest.Mock
