@@ -60,7 +60,7 @@ export async function retry<T>(fn: () => Promise<T>): Promise<T> {
       }
     },
     // Terraform handles this similarly, https://github.com/hashicorp/terraform/pull/4316/files
-    { maxTimeout: 5000, minTimeout: 1000, retries: 12 }
+    { maxTimeout: 5000, minTimeout: 1000, retries: 15 }
   )
 }
 

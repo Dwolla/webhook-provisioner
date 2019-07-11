@@ -80,8 +80,8 @@ test("update", async () => {
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: { Variables: { CONCURRENCY: con, VERSION: c.version } },
     FunctionName: fn,
-    MemorySize: 256,
-    Runtime: "nodejs8.10",
+    MemorySize: 128,
+    Runtime: "nodejs10.x",
     Timeout: 32
   })
 })

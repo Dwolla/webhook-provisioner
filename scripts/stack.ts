@@ -3,9 +3,11 @@ import {
   DimensionHash,
   Metric
 } from "@aws-cdk/aws-cloudwatch"
+import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
+import { ITopic, Topic } from "@aws-cdk/aws-sns"
 import { Queue } from "@aws-cdk/aws-sqs"
-import { App, Stack, StackProps, Tag } from "@aws-cdk/cdk"
+import { App, Duration, Stack, StackProps, Tag } from "@aws-cdk/core"
 import { envVar, error } from "@therockstorm/utils"
 import SNS from "aws-sdk/clients/sns"
 import { name } from "../package.json"
@@ -17,7 +19,7 @@ type AlarmProps = Readonly<{
   comparisonOperator?: ComparisonOperator
   dimensions?: DimensionHash
   evaluationPeriods?: number
-  periodSec?: number
+  period?: Duration
   statistic?: string
   threshold?: number
 }>
@@ -48,11 +50,11 @@ const resourceName = (
 const capitalize = (s: string) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`
 
 class MyStack extends Stack {
-  private topicArn: string
+  private topic: ITopic
 
   constructor(parent: App, id: string, topicArn: string, props?: StackProps) {
     super(parent, id, props)
-    this.topicArn = topicArn
+    this.topic = Topic.fromTopicArn(this, "SnsTopic", topicArn)
     ;[
       {
         metricName: "ApproximateAgeOfOldestMessage",
@@ -85,8 +87,8 @@ class MyStack extends Stack {
       new Queue(this, ref, {
         // tslint:disable-line
         queueName,
-        retentionPeriodSec: 1209600,
-        visibilityTimeoutSec: 180
+        retentionPeriod: Duration.days(14),
+        visibilityTimeout: Duration.minutes(3)
       })
     }
 
@@ -96,7 +98,7 @@ class MyStack extends Stack {
       dimensions: { QueueName: queueName },
       metricName: ps.metricName,
       namespace: "AWS/SQS",
-      periodSec: 900,
+      period: Duration.minutes(15),
       statistic: ps.statistic,
       threshold: ps.threshold
     })
@@ -115,7 +117,7 @@ class MyStack extends Stack {
         `${capped}LogGroup`,
         `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`
       )
-      const filter = logGroup.newMetricFilter(this, `${ref}ErrorFilter`, {
+      const filter = logGroup.addMetricFilter(`${ref}ErrorFilter`, {
         filterPattern: { logPatternString: '"[error]"' },
         metricName,
         metricNamespace: namespace
@@ -144,17 +146,17 @@ class MyStack extends Stack {
       metricName: props.metricName,
       namespace: props.namespace
     })
-      .newAlarm(this, ref, {
+      .createAlarm(this, ref, {
         alarmName: props.alarmName,
         comparisonOperator:
           props.comparisonOperator ||
-          ComparisonOperator.GreaterThanOrEqualToThreshold,
+          ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
         evaluationPeriods: props.evaluationPeriods || 1,
-        periodSec: props.periodSec || 60,
+        period: props.period || Duration.minutes(1),
         statistic: props.statistic || "Sum",
         threshold: props.threshold || 1
       })
-      .addAlarmAction({ alarmActionArn: this.topicArn })
+      .addAlarmAction(new SnsAction(this.topic))
 }
 
 const create = async () => {
@@ -168,19 +170,19 @@ const create = async () => {
   }
   const app = new App()
   const stack = new MyStack(app, "Stack", arn)
-  stack.node.apply(new Tag("Environment", ENV))
-  stack.node.apply(new Tag("Project", PROJECT))
-  stack.node.apply(new Tag("Creator", "serverless"))
-  stack.node.apply(new Tag("Team", "growth"))
-  stack.node.apply(new Tag("Visibility", "external"))
-  if (BUILD_URL) stack.node.apply(new Tag("DeployJobUrl", BUILD_URL))
+  stack.node.applyAspect(new Tag("Environment", ENV))
+  stack.node.applyAspect(new Tag("Project", PROJECT))
+  stack.node.applyAspect(new Tag("Creator", "serverless"))
+  stack.node.applyAspect(new Tag("Team", "growth"))
+  stack.node.applyAspect(new Tag("Visibility", "external"))
+  if (BUILD_URL) stack.node.applyAspect(new Tag("DeployJobUrl", BUILD_URL))
   if (GIT_URL) {
-    stack.node.apply(new Tag("org.label-schema.vcs-url", GIT_URL))
+    stack.node.applyAspect(new Tag("org.label-schema.vcs-url", GIT_URL))
   }
   if (GIT_COMMIT) {
-    stack.node.apply(new Tag("org.label-schema.vcs-ref", GIT_COMMIT))
+    stack.node.applyAspect(new Tag("org.label-schema.vcs-ref", GIT_COMMIT))
   }
-  app.run()
+  app.synth()
 }
 
 create()

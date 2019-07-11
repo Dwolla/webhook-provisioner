@@ -216,10 +216,10 @@ test("toCreateFunc", () => {
     },
     FunctionName: ln,
     Handler: "src/handler.handle",
-    MemorySize: 256,
+    MemorySize: 128,
     Publish: true,
     Role: req.role.roleArn,
-    Runtime: "nodejs8.10",
+    Runtime: "nodejs10.x",
     Tags: TAGS,
     Timeout: req.timeout
   })
