@@ -78,8 +78,8 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
       .updateFunctionConfiguration({
         Environment: { Variables: { ...f.vars, VERSION: lc.version } },
         FunctionName: f.name,
-        MemorySize: 256,
-        Runtime: "nodejs8.10",
+        MemorySize: 128,
+        Runtime: "nodejs10.x",
         Timeout: calculateFuncTimeout(f.vars.CONCURRENCY)
       })
       .promise()).FunctionArn as string

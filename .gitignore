@@ -7,4 +7,5 @@ stack.yml
 .serverless/
 .vscode/
 .webpack/
+cdk.out/
 node_modules/

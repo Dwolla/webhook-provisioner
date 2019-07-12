@@ -152,10 +152,10 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
   },
   FunctionName: lambdaName(req.cId),
   Handler: "src/handler.handle",
-  MemorySize: 256,
+  MemorySize: 128,
   Publish: true,
   Role: req.role.roleArn,
-  Runtime: "nodejs8.10",
+  Runtime: "nodejs10.x",
   Tags: tags(req.cId, false) as LTags,
   Timeout: req.timeout
 })
