@@ -16,7 +16,7 @@ iam.mockImplementationOnce(() => ({
 }))
 import { createRole as cr } from "../../src/create/createRole"
 
-test("createLogGroup", async () => {
+test("createRole", async () => {
   const cId = 123
   const c = { x: 0 }
   const cp = { x: 1 }
