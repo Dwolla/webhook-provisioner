@@ -33,6 +33,7 @@
     "aws-cdk": "^1.0.0",
     "aws-sdk": "^2.493.0",
     "husky": "^3.0.0",
+    "serverless-iam-roles-per-function": "^2.0.1",
     "serverless-pseudo-parameters": "^2.4.0",
     "skripts": "0.0.16",
     "tslint": "^5.18.0",
