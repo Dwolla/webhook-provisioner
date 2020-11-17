@@ -26,7 +26,7 @@ import {
   toPutMetricFilter,
   toPutRetentionPolicy,
   toQueueDepthAlarm,
-  toTagQueue
+  toTagQueue,
 } from "../../src/create/mapper"
 
 const BATCH = 10
@@ -42,7 +42,7 @@ const TAGS = {
   Environment: ENV,
   Project: PROJECT,
   Team: "growth",
-  Visibility: "internal"
+  Visibility: "internal",
 }
 
 test("toCreateQueue", () => {
@@ -55,24 +55,24 @@ test("toCreateQueue", () => {
       MessageRetentionPeriod: "1209600",
       RedrivePolicy: JSON.stringify({
         deadLetterTargetArn: dlqArn,
-        maxReceiveCount: 10
+        maxReceiveCount: 10,
       }),
-      VisibilityTimeout: (FUNCTION_TIMEOUT_SEC * 6).toString()
+      VisibilityTimeout: (FUNCTION_TIMEOUT_SEC * 6).toString(),
     },
-    QueueName: qn
+    QueueName: qn,
   })
 })
 
 test("toTagQueue", () =>
   expect(toTagQueue(CID, URL)).toEqual({
     QueueUrl: URL,
-    Tags: TAGS
+    Tags: TAGS,
   }))
 
 test("toGetQueueAttributes", () =>
   expect(toGetQueueAttributes(URL)).toEqual({
     AttributeNames: ["QueueArn"],
-    QueueUrl: URL
+    QueueUrl: URL,
   }))
 
 test("toCreateLogGroup", () => {
@@ -81,7 +81,7 @@ test("toCreateLogGroup", () => {
 
   expect(toCreateLogGroup(CID)).toEqual({
     logGroupName: lgn,
-    tags: TAGS
+    tags: TAGS,
   })
 })
 
@@ -91,7 +91,7 @@ test("toPutRetentionPolicy", () => {
 
   expect(toPutRetentionPolicy(CID)).toEqual({
     logGroupName: lgn,
-    retentionInDays: 365
+    retentionInDays: 365,
   })
 })
 
@@ -101,7 +101,7 @@ test("toDescribeLogGroups", () => {
 
   expect(toDescribeLogGroups(CID)).toEqual({
     limit: 1,
-    logGroupNamePrefix: lgn
+    logGroupNamePrefix: lgn,
   })
 })
 
@@ -121,9 +121,9 @@ test("toPutMetricFilter", () => {
       {
         metricName: mn,
         metricNamespace: "LogMetrics",
-        metricValue: "1"
-      }
-    ]
+        metricValue: "1",
+      },
+    ],
   })
 })
 
@@ -143,7 +143,7 @@ test("toQueueDepthAlarm", () => {
     Namespace: "AWS/SQS",
     Period: 900,
     Statistic: "Average",
-    Threshold: 900
+    Threshold: 900,
   })
 })
 
@@ -163,7 +163,7 @@ test("toLambdaErrorAlarm", () => {
     Namespace: "AWS/Lambda",
     Period: 60,
     Statistic: "Sum",
-    Threshold: 1
+    Threshold: 1,
   })
 })
 
@@ -183,7 +183,7 @@ test("toLogErrorAlarm", () => {
     Namespace: "LogMetrics",
     Period: 60,
     Statistic: "Sum",
-    Threshold: 1
+    Threshold: 1,
   })
 })
 
@@ -196,10 +196,10 @@ test("toCreateFunc", () => {
     queues: {
       error: { url: "eu", arn: "e" },
       partner: { url: "pu", arn: "p" },
-      result: { url: "ru", arn: "r" }
+      result: { url: "ru", arn: "r" },
     },
     role: { roleArn: "ra", roleName: "rn", policyArn: "pa" },
-    timeout: 10
+    timeout: 10,
   }
   lambdaName.mockReturnValue(ln)
 
@@ -211,8 +211,8 @@ test("toCreateFunc", () => {
         ERROR_QUEUE_URL: req.queues.error.url,
         PARTNER_QUEUE_URL: req.queues.partner.url,
         RESULT_QUEUE_URL: req.queues.result.url,
-        VERSION: req.location.version
-      }
+        VERSION: req.location.version,
+      },
     },
     FunctionName: ln,
     Handler: "src/handler.handle",
@@ -221,7 +221,7 @@ test("toCreateFunc", () => {
     Role: req.role.roleArn,
     Runtime: "nodejs10.x",
     Tags: TAGS,
-    Timeout: req.timeout
+    Timeout: req.timeout,
   })
 })
 
@@ -232,7 +232,7 @@ test("toPutFuncConcurrency", () => {
 
   expect(toPutFuncConcurrency(CID, con)).toEqual({
     FunctionName: ln,
-    ReservedConcurrentExecutions: con
+    ReservedConcurrentExecutions: con,
   })
 })
 
@@ -240,7 +240,7 @@ test("toCreateEventSourceMapping", () => {
   const ln = "ln"
   const qs = {
     partner: { url: "pu", arn: "p" },
-    result: { url: "ru", arn: "a" }
+    result: { url: "ru", arn: "a" },
   }
   lambdaName.mockReturnValue(ln)
 
@@ -248,7 +248,7 @@ test("toCreateEventSourceMapping", () => {
     BatchSize: BATCH,
     Enabled: true,
     EventSourceArn: qs.partner.arn,
-    FunctionName: ln
+    FunctionName: ln,
   })
 })
 
@@ -262,10 +262,10 @@ test("toCreateRole", () => {
         {
           Action: ["sts:AssumeRole"],
           Effect: "Allow",
-          Principal: { Service: ["lambda.amazonaws.com"] }
-        }
+          Principal: { Service: ["lambda.amazonaws.com"] },
+        },
       ],
-      Version: "2012-10-17"
+      Version: "2012-10-17",
     }),
     Path: "/",
     RoleName: rn,
@@ -275,8 +275,8 @@ test("toCreateRole", () => {
       { Key: "Environment", Value: ENV },
       { Key: "Project", Value: PROJECT },
       { Key: "Team", Value: "growth" },
-      { Key: "Visibility", Value: "internal" }
-    ]
+      { Key: "Visibility", Value: "internal" },
+    ],
   })
 })
 
@@ -286,7 +286,7 @@ test("toCreatePolicy", () => {
   const qs = {
     error: { url: "eu", arn: "e" },
     partner: { url: "pu", arn: "p" },
-    result: { url: "ru", arn: "r" }
+    result: { url: "ru", arn: "r" },
   }
   policyName.mockReturnValue(pn)
 
@@ -298,29 +298,29 @@ test("toCreatePolicy", () => {
             "sqs:DeleteMessage",
             "sqs:GetQueueAttributes",
             "sqs:ReceiveMessage",
-            "sqs:SendMessage"
+            "sqs:SendMessage",
           ],
           Effect: "Allow",
-          Resource: qs.partner.arn
+          Resource: qs.partner.arn,
         },
         {
           Action: ["sqs:SendMessage"],
           Effect: "Allow",
-          Resource: [qs.result.arn, qs.error.arn]
+          Resource: [qs.result.arn, qs.error.arn],
         },
         {
           Action: ["logs:CreateLogStream"],
           Effect: "Allow",
-          Resource: lg.arn
+          Resource: lg.arn,
         },
         {
           Action: ["logs:PutLogEvents"],
           Effect: "Allow",
-          Resource: `${lg.arn}:*`
-        }
+          Resource: `${lg.arn}:*`,
+        },
       ],
-      Version: "2012-10-17"
+      Version: "2012-10-17",
     }),
-    PolicyName: pn
+    PolicyName: pn,
   })
 })

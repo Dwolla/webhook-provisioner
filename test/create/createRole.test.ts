@@ -12,7 +12,7 @@ const attachRolePolicy = jest.fn()
 iam.mockImplementationOnce(() => ({
   attachRolePolicy,
   createPolicy,
-  createRole
+  createRole,
 }))
 import { createRole as cr } from "../../src/create/createRole"
 
@@ -24,16 +24,16 @@ test("createRole", async () => {
   const qs = {
     error: { url: "eu", arn: "e" },
     partner: { url: "pu", arn: "p" },
-    result: { url: "ru", arn: "r" }
+    result: { url: "ru", arn: "r" },
   }
   const r = { roleName: "rn", roleArn: "ra", policyArn: "pa" }
   toCreateRole.mockReturnValue(c)
   toCreatePolicy.mockReturnValue(cp)
   createRole.mockReturnValue({
-    promise: () => ({ Role: { RoleName: r.roleName, Arn: r.roleArn } })
+    promise: () => ({ Role: { RoleName: r.roleName, Arn: r.roleArn } }),
   })
   createPolicy.mockReturnValue({
-    promise: () => ({ Policy: { Arn: r.policyArn } })
+    promise: () => ({ Policy: { Arn: r.policyArn } }),
   })
   attachRolePolicy.mockReturnValue({ promise: () => ({}) })
 
@@ -45,6 +45,6 @@ test("createRole", async () => {
   expect(createPolicy).toHaveBeenCalledWith(cp)
   expect(attachRolePolicy).toHaveBeenCalledWith({
     PolicyArn: r.policyArn,
-    RoleName: r.roleName
+    RoleName: r.roleName,
   })
 })

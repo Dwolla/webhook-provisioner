@@ -13,7 +13,7 @@ describe("handler", () => {
 
     await expect(handle(evt)).resolves.toEqual({
       body: JSON.stringify({ queueUrl: url }),
-      statusCode: 200
+      statusCode: 200,
     })
 
     expect(create).toHaveBeenCalledWith(evt)
@@ -25,7 +25,7 @@ describe("handler", () => {
 
     await expect(handle(evt)).resolves.toEqual({
       body: JSON.stringify({ error: err }),
-      statusCode: 500
+      statusCode: 500,
     })
 
     expect(create).toHaveBeenCalledWith(evt)

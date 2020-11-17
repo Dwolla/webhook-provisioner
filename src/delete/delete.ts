@@ -14,7 +14,7 @@ import {
   logGroupName,
   queueDepthAlarmName,
   queueName,
-  roleName
+  roleName,
 } from "../mapper"
 import { ignore404 } from "../util"
 
@@ -32,7 +32,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
     cwl
       .deleteMetricFilter({
         filterName: fName,
-        logGroupName: lgName
+        logGroupName: lgName,
       })
       .promise()
   )
@@ -43,7 +43,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
   const aNames = [
     queueDepthAlarmName(cId),
     lambdaErrorAlarmName(cId),
-    logErrorAlarmName(cId)
+    logErrorAlarmName(cId),
   ]
   log(`Deleting alarms ${aNames.join(", ")}`)
   await ignore404(() => cw.deleteAlarms({ AlarmNames: aNames }).promise())

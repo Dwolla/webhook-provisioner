@@ -15,7 +15,7 @@ const sqs = (SQS as unknown) as jest.Mock
 lam.mockImplementationOnce(() => ({
   getFunctionConfiguration,
   putFunctionConcurrency,
-  updateFunctionConfiguration
+  updateFunctionConfiguration,
 }))
 sqs.mockImplementationOnce(() => ({ getQueueUrl, setQueueAttributes }))
 const lambdaName = mapper.lambdaName as jest.Mock
@@ -33,16 +33,16 @@ test("update", async () => {
   queueName.mockReturnValue(qn)
   putFunctionConcurrency.mockReturnValue({ promise: () => ({}) })
   getQueueUrl.mockReturnValue({
-    promise: () => ({ QueueUrl: qu })
+    promise: () => ({ QueueUrl: qu }),
   })
   updateFunctionConfiguration.mockReturnValue({
-    promise: () => ({ FunctionArn: arn })
+    promise: () => ({ FunctionArn: arn }),
   })
   getFunctionConfiguration.mockReturnValue({
-    promise: () => ({ Environment: { Variables: vs } })
+    promise: () => ({ Environment: { Variables: vs } }),
   })
   setQueueAttributes.mockReturnValue({
-    promise: () => ({})
+    promise: () => ({}),
   })
 
   await expect(update(evt)).resolves.toEqual([{ arn }])
@@ -51,16 +51,16 @@ test("update", async () => {
   expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
   expect(setQueueAttributes).toHaveBeenCalledWith({
     Attributes: { VisibilityTimeout: "192" },
-    QueueUrl: qu
+    QueueUrl: qu,
   })
   expect(getFunctionConfiguration).toHaveBeenCalledWith({ FunctionName: ln })
   expect(putFunctionConcurrency).toHaveBeenCalledWith({
     FunctionName: ln,
-    ReservedConcurrentExecutions: 2
+    ReservedConcurrentExecutions: 2,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: { Variables: { ...vs, CONCURRENCY: "5" } },
     FunctionName: ln,
-    Timeout: 32
+    Timeout: 32,
   })
 })

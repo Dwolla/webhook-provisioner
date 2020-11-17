@@ -5,7 +5,7 @@ import {
   toCreateLogGroup,
   toDescribeLogGroups,
   toPutMetricFilter,
-  toPutRetentionPolicy
+  toPutRetentionPolicy,
 } from "./mapper"
 
 const cwl = new CloudWatchLogs()
@@ -16,7 +16,7 @@ export const createLogGroup = async (cId: ConsumerId): Promise<LogGroup> =>
     await cwl.putRetentionPolicy(toPutRetentionPolicy(cId)).promise()
     const [res] = await Promise.all([
       cwl.describeLogGroups(toDescribeLogGroups(cId)).promise(),
-      createMetricFilter(cId)
+      createMetricFilter(cId),
     ])
     const lg = res.logGroups
     return { arn: lg && lg[0] && lg[0].arn ? lg[0].arn : "" }

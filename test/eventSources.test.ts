@@ -7,7 +7,7 @@ const listEventSourceMappings = jest.fn()
 const updateEventSourceMapping = jest.fn()
 const lam = ({
   listEventSourceMappings,
-  updateEventSourceMapping
+  updateEventSourceMapping,
 } as unknown) as Lambda
 import { update } from "../src/eventSources"
 
@@ -31,7 +31,7 @@ describe("update", () => {
     expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: ln })
     expect(updateEventSourceMapping).toHaveBeenCalledWith({
       Enabled: enabled,
-      UUID: id
+      UUID: id,
     })
   })
 

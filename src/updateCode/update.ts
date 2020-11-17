@@ -2,7 +2,7 @@ import { log } from "@therockstorm/utils"
 import Lambda, {
   EnvironmentResponse as ER,
   EnvironmentVariables as EV,
-  FunctionList
+  FunctionList,
 } from "aws-sdk/clients/lambda"
 import pLimit from "p-limit"
 import { IFunc, Location } from ".."
@@ -19,12 +19,14 @@ export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFuncs()])
   const [upd, notUpd] = partition(
     fns,
-    f => toEpoch(f.vars.VERSION) < toEpoch(lc.version)
+    (f) => toEpoch(f.vars.VERSION) < toEpoch(lc.version)
   )
-  if (notUpd.length) log(`Not updating ${notUpd.map(f => f.name).join(", ")}`)
+  if (notUpd.length) {
+    log(`Not updating ${notUpd.map((f) => f.name).join(", ")}`)
+  }
 
   const res = await Promise.all(
-    upd.map(f => limit<any, IFunc>(() => update(f, lc)))
+    upd.map((f) => limit<any, IFunc>(() => update(f, lc)))
   )
   log("Complete")
   return res
@@ -41,15 +43,15 @@ const allFuncs = async (): Promise<Fn[]> => {
   const toFns = (fns: FunctionList) =>
     fns
       .filter(
-        f =>
+        (f) =>
           f.FunctionName &&
           re.test(f.FunctionName) &&
           f.Environment &&
           f.Environment.Variables
       )
-      .map(f => ({
+      .map((f) => ({
         name: f.FunctionName as string,
-        vars: (f.Environment as ER).Variables as EV
+        vars: (f.Environment as ER).Variables as EV,
       }))
 
   return allFuncsRec()
@@ -71,17 +73,19 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
         FunctionName: f.name,
         Publish: true,
         S3Bucket: lc.bucket,
-        S3Key: lc.key
+        S3Key: lc.key,
       })
       .promise()
-    const arn = (await lam
-      .updateFunctionConfiguration({
-        Environment: { Variables: { ...f.vars, VERSION: lc.version } },
-        FunctionName: f.name,
-        MemorySize: 128,
-        Runtime: "nodejs10.x",
-        Timeout: calculateFuncTimeout(f.vars.CONCURRENCY)
-      })
-      .promise()).FunctionArn as string
+    const arn = (
+      await lam
+        .updateFunctionConfiguration({
+          Environment: { Variables: { ...f.vars, VERSION: lc.version } },
+          FunctionName: f.name,
+          MemorySize: 128,
+          Runtime: "nodejs10.x",
+          Timeout: calculateFuncTimeout(f.vars.CONCURRENCY),
+        })
+        .promise()
+    ).FunctionArn as string
     return { arn }
   })

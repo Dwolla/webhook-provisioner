@@ -14,7 +14,7 @@ export const createRole = async (
   await logRes<Role>("Creating role and policy", async () => {
     const [rr, pr] = await Promise.all([
       iam.createRole(toCreateRole(cId)).promise(),
-      iam.createPolicy(toCreatePolicy(cId, lg, qs)).promise()
+      iam.createPolicy(toCreatePolicy(cId, lg, qs)).promise(),
     ])
     const roleName = rr.Role.RoleName
     const policyArn = pr.Policy && pr.Policy.Arn ? pr.Policy.Arn : ""

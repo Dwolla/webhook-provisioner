@@ -39,6 +39,8 @@ export const exec = async (
 }
 
 const getEventSources = async (lam: Lambda, cId: ConsumerId) =>
-  (await lam
-    .listEventSourceMappings({ FunctionName: lambdaName(cId) })
-    .promise()).EventSourceMappings || []
+  (
+    await lam
+      .listEventSourceMappings({ FunctionName: lambdaName(cId) })
+      .promise()
+  ).EventSourceMappings || []

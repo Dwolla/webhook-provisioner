@@ -19,7 +19,7 @@ export const create = async (evt: IConcurrencyEvent): Promise<string> => {
   const queues = await createQueue(cId, timeout)
   const [location, logGroup] = await Promise.all([
     latestCode(),
-    createLogGroup(cId)
+    createLogGroup(cId),
   ])
   const role = await createRole(cId, logGroup, queues)
   await createLambda({ cId, concurrency, location, queues, role, timeout })

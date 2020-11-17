@@ -14,7 +14,7 @@ export const update = async (evt: IUpdateEvent): Promise<IFunc[]> => {
   const con = validateConcurrency(evt.concurrency)
   const to = calculateFuncTimeout(con.post)
   const res = await Promise.all(
-    evt.consumerIds.map(id => limit<any, IFunc>(() => upd(id, con, to)))
+    evt.consumerIds.map((id) => limit<any, IFunc>(() => upd(id, con, to)))
   )
   log("Complete")
   return res
@@ -29,33 +29,33 @@ const upd = async (id: ConsumerId, con: IConcurrency, to: number) =>
       lam
         .putFunctionConcurrency({
           FunctionName: ln,
-          ReservedConcurrentExecutions: con.reserved
+          ReservedConcurrentExecutions: con.reserved,
         })
-        .promise()
+        .promise(),
     ])
     const [lRes] = await Promise.all([
       lam
         .updateFunctionConfiguration({
           Environment: {
-            Variables: { ...vs, CONCURRENCY: con.post.toString() }
+            Variables: { ...vs, CONCURRENCY: con.post.toString() },
           },
           FunctionName: ln,
-          Timeout: to
+          Timeout: to,
         })
         .promise(),
       sqs
         .setQueueAttributes({
           Attributes: { VisibilityTimeout: (to * 6).toString() },
-          QueueUrl: qRes.QueueUrl || ""
+          QueueUrl: qRes.QueueUrl || "",
         })
-        .promise()
+        .promise(),
     ])
     return { arn: lRes.FunctionArn as string }
   })
 
 const getEnvVars = async (ln: string): Promise<EnvironmentVariables> => {
-  const env = (await lam
-    .getFunctionConfiguration({ FunctionName: ln })
-    .promise()).Environment
+  const env = (
+    await lam.getFunctionConfiguration({ FunctionName: ln }).promise()
+  ).Environment
   return env && env.Variables ? env.Variables : {}
 }

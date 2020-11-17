@@ -10,7 +10,7 @@ const lam = (Lambda as unknown) as jest.Mock
 lam.mockImplementationOnce(() => ({
   listFunctions,
   updateFunctionCode,
-  updateFunctionConfiguration
+  updateFunctionConfiguration,
 }))
 const latestCode = lc.latestCode as jest.Mock
 import { updateAll } from "../../src/updateCode/update"
@@ -25,23 +25,23 @@ test("update", async () => {
   const noName = { Environment: { Variables: { VERSION: ver.toString() } } }
   const wrongName = {
     Environment: { Variables: { VERSION: ver.toString() } },
-    FunctionName: "f"
+    FunctionName: "f",
   }
   const noEnv = { FunctionName: valid(i++) }
   const noVars = { FunctionName: valid(i++), Environment: {} }
   const noVer = { FunctionName: valid(i++), Environment: {} }
   const sameVer = {
     Environment: { Variables: { VERSION: (ver + 1).toString() } },
-    FunctionName: valid(i++)
+    FunctionName: valid(i++),
   }
   const newerVer = {
     Environment: { Variables: { VERSION: (ver + 2).toString() } },
-    FunctionName: valid(i++)
+    FunctionName: valid(i++),
   }
   const fn = valid(i)
   const olderVer = {
     Environment: { Variables: { VERSION: ver.toString(), CONCURRENCY: con } },
-    FunctionName: fn
+    FunctionName: fn,
   }
   listFunctions.mockReturnValueOnce({
     promise: () => ({
@@ -53,16 +53,16 @@ test("update", async () => {
         noVer,
         sameVer,
         newerVer,
-        olderVer
+        olderVer,
       ],
-      NextMarker: 1
-    })
+      NextMarker: 1,
+    }),
   })
   listFunctions.mockReturnValueOnce({ promise: () => ({ Functions: [] }) })
   latestCode.mockResolvedValue(c)
   updateFunctionCode.mockReturnValue({ promise: () => ({}) })
   updateFunctionConfiguration.mockReturnValue({
-    promise: () => ({ FunctionArn: arn })
+    promise: () => ({ FunctionArn: arn }),
   })
 
   await expect(updateAll()).resolves.toEqual([{ arn }])
@@ -75,13 +75,13 @@ test("update", async () => {
     FunctionName: fn,
     Publish: true,
     S3Bucket: c.bucket,
-    S3Key: c.key
+    S3Key: c.key,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: { Variables: { CONCURRENCY: con, VERSION: c.version } },
     FunctionName: fn,
     MemorySize: 128,
     Runtime: "nodejs10.x",
-    Timeout: 32
+    Timeout: 32,
   })
 })

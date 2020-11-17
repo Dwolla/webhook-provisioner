@@ -4,24 +4,24 @@ import {
   DescribeLogGroupsRequest,
   PutMetricFilterRequest,
   PutRetentionPolicyRequest,
-  Tags
+  Tags,
 } from "aws-sdk/clients/cloudwatchlogs"
 import {
   CreatePolicyRequest,
   CreateRoleRequest,
-  tagListType as ITags
+  tagListType as ITags,
 } from "aws-sdk/clients/iam"
 import {
   CreateEventSourceMappingRequest,
   CreateFunctionRequest,
   PutFunctionConcurrencyRequest,
-  Tags as LTags
+  Tags as LTags,
 } from "aws-sdk/clients/lambda"
 import {
   CreateQueueRequest,
   GetQueueAttributesRequest,
   TagMap as STags,
-  TagQueueRequest
+  TagQueueRequest,
 } from "aws-sdk/clients/sqs"
 import { ConsumerId, CreateFuncReq, LogGroup, Queues } from ".."
 import { name } from "../../package.json"
@@ -35,7 +35,7 @@ import {
   policyName,
   queueDepthAlarmName,
   queueName,
-  roleName
+  roleName,
 } from "../mapper"
 import { BATCH, ENV, PROJECT } from "../util"
 
@@ -59,11 +59,11 @@ export const toCreateQueue = (
     MessageRetentionPeriod: "1209600", // 14 days
     RedrivePolicy: JSON.stringify({
       deadLetterTargetArn: dlqArn,
-      maxReceiveCount: 10
+      maxReceiveCount: 10,
     }),
-    VisibilityTimeout: (funcTimeout * 6).toString()
+    VisibilityTimeout: (funcTimeout * 6).toString(),
   },
-  QueueName: queueName(cId)
+  QueueName: queueName(cId),
 })
 
 export const toTagQueue = (
@@ -71,33 +71,33 @@ export const toTagQueue = (
   queueUrl: string
 ): TagQueueRequest => ({
   QueueUrl: queueUrl,
-  Tags: tags(cId, false) as STags
+  Tags: tags(cId, false) as STags,
 })
 
 export const toGetQueueAttributes = (
   queueUrl: string
 ): GetQueueAttributesRequest => ({
   AttributeNames: ["QueueArn"],
-  QueueUrl: queueUrl
+  QueueUrl: queueUrl,
 })
 
 export const toCreateLogGroup = (cId: ConsumerId): CreateLogGroupRequest => ({
   logGroupName: logGroupName(cId),
-  tags: tags(cId, false) as Tags
+  tags: tags(cId, false) as Tags,
 })
 
 export const toPutRetentionPolicy = (
   cId: ConsumerId
 ): PutRetentionPolicyRequest => ({
   logGroupName: logGroupName(cId),
-  retentionInDays: 365
+  retentionInDays: 365,
 })
 
 export const toDescribeLogGroups = (
   cId: ConsumerId
 ): DescribeLogGroupsRequest => ({
   limit: 1,
-  logGroupNamePrefix: logGroupName(cId)
+  logGroupNamePrefix: logGroupName(cId),
 })
 
 export const toPutMetricFilter = (cId: ConsumerId): PutMetricFilterRequest => ({
@@ -108,9 +108,9 @@ export const toPutMetricFilter = (cId: ConsumerId): PutMetricFilterRequest => ({
     {
       metricName: metricName(cId),
       metricNamespace: "LogMetrics",
-      metricValue: "1"
-    }
-  ]
+      metricValue: "1",
+    },
+  ],
 })
 
 export const toQueueDepthAlarm = (cId: ConsumerId, topicArn: string) =>
@@ -121,7 +121,7 @@ export const toQueueDepthAlarm = (cId: ConsumerId, topicArn: string) =>
     namespace: "AWS/SQS",
     period: 900,
     statistic: "Average",
-    threshold: 900
+    threshold: 900,
   })
 
 export const toLambdaErrorAlarm = (cId: ConsumerId, topicArn: string) =>
@@ -129,14 +129,14 @@ export const toLambdaErrorAlarm = (cId: ConsumerId, topicArn: string) =>
     alarmName: lambdaErrorAlarmName(cId),
     dimensions: [{ Name: "FunctionName", Value: lambdaName(cId) }],
     metricName: "Errors",
-    namespace: "AWS/Lambda"
+    namespace: "AWS/Lambda",
   })
 
 export const toLogErrorAlarm = (cId: ConsumerId, topicArn: string) =>
   toPutMetricAlarm(topicArn, {
     alarmName: logErrorAlarmName(cId),
     metricName: metricName(cId),
-    namespace: "LogMetrics"
+    namespace: "LogMetrics",
   })
 
 export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
@@ -147,8 +147,8 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
       ERROR_QUEUE_URL: req.queues.error.url,
       PARTNER_QUEUE_URL: req.queues.partner.url,
       RESULT_QUEUE_URL: req.queues.result.url,
-      VERSION: req.location.version
-    }
+      VERSION: req.location.version,
+    },
   },
   FunctionName: lambdaName(req.cId),
   Handler: "src/handler.handle",
@@ -157,7 +157,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
   Role: req.role.roleArn,
   Runtime: "nodejs10.x",
   Tags: tags(req.cId, false) as LTags,
-  Timeout: req.timeout
+  Timeout: req.timeout,
 })
 
 export const toPutFuncConcurrency = (
@@ -165,7 +165,7 @@ export const toPutFuncConcurrency = (
   con: number
 ): PutFunctionConcurrencyRequest => ({
   FunctionName: lambdaName(cId),
-  ReservedConcurrentExecutions: con
+  ReservedConcurrentExecutions: con,
 })
 
 export const toCreateEventSourceMapping = (
@@ -175,7 +175,7 @@ export const toCreateEventSourceMapping = (
   BatchSize: BATCH,
   Enabled: true,
   EventSourceArn: arn,
-  FunctionName: lambdaName(cId)
+  FunctionName: lambdaName(cId),
 })
 
 export const toCreateRole = (cId: ConsumerId): CreateRoleRequest => ({
@@ -184,14 +184,14 @@ export const toCreateRole = (cId: ConsumerId): CreateRoleRequest => ({
       {
         Action: ["sts:AssumeRole"],
         Effect: "Allow",
-        Principal: { Service: ["lambda.amazonaws.com"] }
-      }
+        Principal: { Service: ["lambda.amazonaws.com"] },
+      },
     ],
-    Version: "2012-10-17"
+    Version: "2012-10-17",
   }),
   Path: "/",
   RoleName: roleName(cId),
-  Tags: tags(cId, true) as ITags
+  Tags: tags(cId, true) as ITags,
 })
 
 export const toCreatePolicy = (
@@ -206,30 +206,30 @@ export const toCreatePolicy = (
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes",
           "sqs:ReceiveMessage",
-          "sqs:SendMessage"
+          "sqs:SendMessage",
         ],
         Effect: "Allow",
-        Resource: qs.partner.arn
+        Resource: qs.partner.arn,
       },
       {
         Action: ["sqs:SendMessage"],
         Effect: "Allow",
-        Resource: [qs.result.arn, qs.error.arn]
+        Resource: [qs.result.arn, qs.error.arn],
       },
       {
         Action: ["logs:CreateLogStream"],
         Effect: "Allow",
-        Resource: lg.arn
+        Resource: lg.arn,
       },
       {
         Action: ["logs:PutLogEvents"],
         Effect: "Allow",
-        Resource: `${lg.arn}:*`
-      }
+        Resource: `${lg.arn}:*`,
+      },
     ],
-    Version: "2012-10-17"
+    Version: "2012-10-17",
   }),
-  PolicyName: policyName(cId)
+  PolicyName: policyName(cId),
 })
 
 const tags = (cId: ConsumerId, list: boolean): Tags | LTags | STags | ITags => {
@@ -239,7 +239,7 @@ const tags = (cId: ConsumerId, list: boolean): Tags | LTags | STags | ITags => {
     Environment: ENV,
     Project: PROJECT,
     Team: "growth",
-    Visibility: "internal"
+    Visibility: "internal",
   }
   return list ? Object.entries(t).map(([k, v]) => ({ Key: k, Value: v })) : t
 }
@@ -257,5 +257,5 @@ const toPutMetricAlarm = (
   Namespace: props.namespace,
   Period: props.period || 60,
   Statistic: props.statistic || "Sum",
-  Threshold: props.threshold || 1
+  Threshold: props.threshold || 1,
 })

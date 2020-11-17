@@ -22,7 +22,7 @@ describe("latestCode", () => {
 
   it("throws error if empty after filter", async () => {
     listObjectsV2.mockReturnValue({
-      promise: () => ({ Contents: [{ Key: "" }] })
+      promise: () => ({ Contents: [{ Key: "" }] }),
     })
     await expect(latestCode()).rejects.toEqual(err)
   })
@@ -30,13 +30,13 @@ describe("latestCode", () => {
   it("returns latestCode", async () => {
     const key = `${prefix}1549039293184-2019-02-01T16:41:33.184Z/func.zip`
     listObjectsV2.mockReturnValue({
-      promise: () => ({ Contents: [{ Key: key }] })
+      promise: () => ({ Contents: [{ Key: key }] }),
     })
 
     expect(await latestCode()).toEqual({
       bucket: "bucket",
       key,
-      version: "2019-02-01T16:41:33.184Z"
+      version: "2019-02-01T16:41:33.184Z",
     })
   })
 })

@@ -15,7 +15,7 @@ sqs.mockImplementationOnce(() => ({
   createQueue,
   getQueueAttributes,
   getQueueUrl,
-  tagQueue
+  tagQueue,
 }))
 import { createQueue as cq } from "../../src/create/createQueue"
 
@@ -34,25 +34,25 @@ test("createQueue", async () => {
   createQueue.mockReturnValue({ promise: () => ({ QueueUrl: p.url }) })
   tagQueue.mockReturnValue({ promise: () => ({}) })
   getQueueUrl.mockReturnValueOnce({
-    promise: () => ({ QueueUrl: r.url })
+    promise: () => ({ QueueUrl: r.url }),
   })
   getQueueUrl.mockReturnValueOnce({
-    promise: () => ({ QueueUrl: e.url })
+    promise: () => ({ QueueUrl: e.url }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: r.arn } })
+    promise: () => ({ Attributes: { QueueArn: r.arn } }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: e.arn } })
+    promise: () => ({ Attributes: { QueueArn: e.arn } }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: p.arn } })
+    promise: () => ({ Attributes: { QueueArn: p.arn } }),
   })
 
   await expect(cq(cId, to)).resolves.toEqual({
     error: e,
     partner: p,
-    result: r
+    result: r,
   })
 
   expect(toCreateQueue).toHaveBeenCalledWith(cId, e.arn, to)

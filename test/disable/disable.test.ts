@@ -13,7 +13,7 @@ const getQueueUrl = jest.fn()
 const purgeQueue = jest.fn()
 lam.mockImplementationOnce(() => ({
   listEventSourceMappings,
-  updateEventSourceMapping
+  updateEventSourceMapping,
 }))
 sqs.mockImplementationOnce(() => ({ getQueueUrl, purgeQueue }))
 const lambdaName = mapper.lambdaName as jest.Mock
@@ -30,7 +30,7 @@ describe("disable", () => {
   queueName.mockReturnValue(qn)
   getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: url }) })
   listEventSourceMappings.mockReturnValue({
-    promise: () => ({ EventSourceMappings: [{ UUID: id }] })
+    promise: () => ({ EventSourceMappings: [{ UUID: id }] }),
   })
   updateEventSourceMapping.mockReturnValue({ promise: () => ({}) })
 
@@ -44,7 +44,7 @@ describe("disable", () => {
     expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: ln })
     expect(updateEventSourceMapping).toHaveBeenCalledWith({
       Enabled: false,
-      UUID: id
+      UUID: id,
     })
   })
 
@@ -53,10 +53,10 @@ describe("disable", () => {
       promise: () =>
         Promise.reject(
           new MyError("hi", "AWS.SimpleQueueService.PurgeQueueInProgress")
-        )
+        ),
     })
     listEventSourceMappings.mockReturnValue({
-      promise: () => ({ EventSourceMappings: [{ UUID: id }] })
+      promise: () => ({ EventSourceMappings: [{ UUID: id }] }),
     })
     updateEventSourceMapping.mockReturnValue({ promise: () => ({}) })
 

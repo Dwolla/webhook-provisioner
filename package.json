@@ -8,9 +8,9 @@
     "clean": "skripts clean scripts --pattern '*.js'",
     "deploy": "npm run build:stack && sls deploy",
     "deploy:docker": "npm run build:docker && cd .webpack/service && skripts docker-publish docker.dwolla.net/dwolla/webhook-provisioner --tag $(git rev-parse HEAD)",
-    "format": "skripts prettier",
-    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket skripts jest",
-    "lint": "skripts tslint",
+    "format": "skripts format",
+    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket jest",
+    "lint": "skripts lint --fix",
     "start": "npm run build && cd .webpack/service && node server.js",
     "test": "npm run lint && npm run build:stack && npm run jest && sls package",
     "watch": "npm run jest -- --watch"
@@ -33,11 +33,11 @@
     "aws-cdk": "^1.4.0",
     "aws-sdk": "^2.512.0",
     "husky": "^3.0.4",
-    "serverless-iam-roles-per-function": "^2.0.1",
+    "serverless-iam-roles-per-function": "3.0.0-d84bffd",
     "serverless-pseudo-parameters": "^2.4.0",
-    "skripts": "0.0.21",
+    "skripts": "^0.8.2",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.9.7"
   },
   "husky": {
     "hooks": {
