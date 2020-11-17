@@ -13,7 +13,7 @@ const FUNCS = [
   { path: "/update", fn: (evt: IUpdateEvent) => uHandler(evt) },
   { path: "/updateCode", fn: () => uCodeHandler() },
   { path: "/delete", fn: (evt: IEvent) => delHandler(evt) },
-  { path: "/disable", fn: (evt: IDisableEvent) => dHandler(evt) }
+  { path: "/disable", fn: (evt: IDisableEvent) => dHandler(evt) },
 ]
 
 const writeRes = (body: object, res: ServerResponse): void => {
@@ -29,7 +29,7 @@ const requestHandler = async (
   const url = req.url || "/"
   if (req.method === "POST") {
     let body = ""
-    req.on("data", data => (body += data))
+    req.on("data", (data) => (body += data))
     req.on("end", async () => await handleReq(JSON.parse(body), url, res))
     return
   }
@@ -38,7 +38,7 @@ const requestHandler = async (
     {
       concurrency: { reserved: 3, post: 6 },
       consumerId: 456,
-      consumerIds: [12345, 456]
+      consumerIds: [12345, 456],
     },
     url,
     res
@@ -54,16 +54,16 @@ const handleReq = async (
     if (url === "/") {
       return writeRes(
         {
-          body: `Visit ${FUNCS.map(f => f.path).join(
+          body: `Visit ${FUNCS.map((f) => f.path).join(
             ", "
           )} to invoke the corresponding Lambda function. POST an event or use the default specified in server.ts with a GET.`,
           event: evt,
-          statusCode: 200
+          statusCode: 200,
         },
         res
       )
     }
-    const func = FUNCS.find(f => f.path === url)
+    const func = FUNCS.find((f) => f.path === url)
     return writeRes(
       func
         ? await func.fn(evt as any)

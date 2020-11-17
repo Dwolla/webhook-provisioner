@@ -1,9 +1,9 @@
 import { ConsumerId, Res } from "."
 import { ENV, PROJECT, REGION } from "./util"
 
-export const toRes = (body: object, statusCode: number = 200): Res => ({
+export const toRes = (body: object, statusCode = 200): Res => ({
   body: JSON.stringify(body),
-  statusCode
+  statusCode,
 })
 
 export const lambdaName = (cId: ConsumerId) => resourceName("lambda", cId)
@@ -41,7 +41,7 @@ export const topicName = () => `cloudwatch-alarm-to-slack-topic-${ENV}`
 const resourceName = (
   resource: string,
   resourceId?: ConsumerId,
-  includeRegion: boolean = false
+  includeRegion = false
 ): string =>
   `${PROJECT}${
     typeof resourceId === "undefined" ? "" : `-${resourceId}`

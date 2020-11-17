@@ -1,7 +1,7 @@
 import {
   ComparisonOperator,
   DimensionHash,
-  Metric
+  Metric,
 } from "@aws-cdk/aws-cloudwatch"
 import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
@@ -41,7 +41,7 @@ const REGION = process.env.AWS_REGION || "us-west-2"
 const resourceName = (
   resource: string,
   resourceId?: string,
-  includeRegion: boolean = false
+  includeRegion = false
 ): string =>
   `${PROJECT}${
     typeof resourceId === "undefined" ? "" : `-${resourceId}`
@@ -60,11 +60,11 @@ class MyStack extends Stack {
         metricName: "ApproximateAgeOfOldestMessage",
         name: "result",
         statistic: "Average",
-        threshold: 900
+        threshold: 900,
       },
-      { name: "error", metricName: "NumberOfMessagesSent" }
-    ].forEach(q => this.queue(q))
-    ;["create", "delete", "disable", "updateCode", "update"].forEach(fn =>
+      { name: "error", metricName: "NumberOfMessagesSent" },
+    ].forEach((q) => this.queue(q))
+    ;["create", "delete", "disable", "updateCode", "update"].forEach((fn) =>
       this.lambda(fn)
     )
 
@@ -73,7 +73,7 @@ class MyStack extends Stack {
       metricName: "ConcurrentExecutions",
       namespace: "AWS/Lambda",
       statistic: "Average",
-      threshold: 500
+      threshold: 500,
     })
   }
 
@@ -88,7 +88,7 @@ class MyStack extends Stack {
         // tslint:disable-line
         queueName,
         retentionPeriod: Duration.days(14),
-        visibilityTimeout: Duration.minutes(3)
+        visibilityTimeout: Duration.minutes(3),
       })
     }
 
@@ -100,7 +100,7 @@ class MyStack extends Stack {
       namespace: "AWS/SQS",
       period: Duration.minutes(15),
       statistic: ps.statistic,
-      threshold: ps.threshold
+      threshold: ps.threshold,
     })
   }
 
@@ -120,7 +120,7 @@ class MyStack extends Stack {
       const filter = logGroup.addMetricFilter(`${ref}ErrorFilter`, {
         filterPattern: { logPatternString: '"[error]"' },
         metricName,
-        metricNamespace: namespace
+        metricNamespace: namespace,
       })
       const resource = filter.node.findChild("Resource") as CfnMetricFilter
       resource.addOverride("DependsOn", [logGroup.node.id])
@@ -130,13 +130,13 @@ class MyStack extends Stack {
       alarmName: resourceName(`${fn}-lambda-error`),
       dimensions: { FunctionName: functionName },
       metricName: "Errors",
-      namespace: "AWS/Lambda"
+      namespace: "AWS/Lambda",
     })
     errorFilter()
     this.metricAlarm(`${ref}LogErrorAlarm`, {
       alarmName: metricName,
       metricName,
-      namespace
+      namespace,
     })
   }
 
@@ -144,7 +144,7 @@ class MyStack extends Stack {
     new Metric({
       dimensions: props.dimensions,
       metricName: props.metricName,
-      namespace: props.namespace
+      namespace: props.namespace,
     })
       .createAlarm(this, ref, {
         alarmName: props.alarmName,
@@ -154,7 +154,7 @@ class MyStack extends Stack {
         evaluationPeriods: props.evaluationPeriods || 1,
         period: props.period || Duration.minutes(1),
         statistic: props.statistic || "Sum",
-        threshold: props.threshold || 1
+        threshold: props.threshold || 1,
       })
       .addAlarmAction(new SnsAction(this.topic))
 }
@@ -162,9 +162,11 @@ class MyStack extends Stack {
 const create = async () => {
   let arn = ""
   try {
-    arn = (await new SNS({ region: REGION })
-      .createTopic({ Name: `cloudwatch-alarm-to-slack-topic-${ENV}` })
-      .promise()).TopicArn as string
+    arn = (
+      await new SNS({ region: REGION })
+        .createTopic({ Name: `cloudwatch-alarm-to-slack-topic-${ENV}` })
+        .promise()
+    ).TopicArn as string
   } catch (e) {
     error({ code: e.code, message: e.message })
   }

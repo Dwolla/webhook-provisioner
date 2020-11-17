@@ -10,7 +10,7 @@ describe("handler", () => {
   it("returns result", async () => {
     await expect(handle(evt)).resolves.toEqual({
       body: JSON.stringify({ success: true }),
-      statusCode: 200
+      statusCode: 200,
     })
 
     expect(disable).toHaveBeenCalledWith(evt)
@@ -22,7 +22,7 @@ describe("handler", () => {
 
     await expect(handle(evt)).resolves.toEqual({
       body: JSON.stringify({ error: err }),
-      statusCode: 500
+      statusCode: 500,
     })
 
     expect(disable).toHaveBeenCalledWith(evt)

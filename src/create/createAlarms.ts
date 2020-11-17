@@ -6,7 +6,7 @@ import { logRes } from "../util"
 import {
   toLambdaErrorAlarm,
   toLogErrorAlarm,
-  toQueueDepthAlarm
+  toQueueDepthAlarm,
 } from "./mapper"
 
 const cw = new CloudWatch()
@@ -20,6 +20,6 @@ export const createAlarms = async (cId: ConsumerId): Promise<void> =>
     await Promise.all([
       cw.putMetricAlarm(toQueueDepthAlarm(cId, topicArn)).promise(),
       cw.putMetricAlarm(toLambdaErrorAlarm(cId, topicArn)).promise(),
-      cw.putMetricAlarm(toLogErrorAlarm(cId, topicArn)).promise()
+      cw.putMetricAlarm(toLogErrorAlarm(cId, topicArn)).promise(),
     ])
   })

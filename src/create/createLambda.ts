@@ -5,7 +5,7 @@ import { logRes, retry } from "../util"
 import {
   toCreateEventSourceMapping,
   toCreateFunc,
-  toPutFuncConcurrency
+  toPutFuncConcurrency,
 } from "./mapper"
 
 const lam = new Lambda()

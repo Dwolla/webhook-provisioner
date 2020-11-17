@@ -27,7 +27,7 @@ test("create", async () => {
   const lg = { x: 1 }
   const qs = {
     partner: { url: "pu", arn: "p" },
-    result: { url: "ru", arn: "a" }
+    result: { url: "ru", arn: "a" },
   }
   const rl = { x: 3 }
   const cas = { x: 4 }
@@ -51,7 +51,7 @@ test("create", async () => {
     location: c,
     queues: qs,
     role: rl,
-    timeout: to
+    timeout: to,
   })
   expect(createAlarms).toHaveBeenCalledWith(evt.consumerId)
 })

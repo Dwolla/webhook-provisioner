@@ -16,7 +16,7 @@ cwl.mockImplementationOnce(() => ({
   createLogGroup,
   describeLogGroups,
   putMetricFilter,
-  putRetentionPolicy
+  putRetentionPolicy,
 }))
 import { createLogGroup as clg } from "../../src/create/createLogGroup"
 
@@ -35,7 +35,7 @@ test("createLogGroup", async () => {
   putRetentionPolicy.mockReturnValue({ promise: () => ({}) })
   putMetricFilter.mockReturnValue({ promise: () => ({}) })
   describeLogGroups.mockReturnValue({
-    promise: () => ({ logGroups: [{ arn }] })
+    promise: () => ({ logGroups: [{ arn }] }),
   })
 
   await expect(clg(cId)).resolves.toEqual({ arn })

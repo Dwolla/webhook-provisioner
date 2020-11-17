@@ -86,5 +86,5 @@ const validate = (n: number, min: number, max: number, def: number) => {
 const msg = (err: AWSError, other?: { [k: string]: any }) => ({
   code: err.code,
   message: err.message,
-  ...other
+  ...other,
 })

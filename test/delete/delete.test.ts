@@ -34,12 +34,12 @@ iam.mockImplementationOnce(() => ({
   deletePolicy,
   deleteRole,
   detachRolePolicy,
-  getRole
+  getRole,
 }))
 lam.mockImplementationOnce(() => ({
   deleteEventSourceMapping,
   deleteFunction,
-  listEventSourceMappings
+  listEventSourceMappings,
 }))
 sqs.mockImplementationOnce(() => ({ getQueueUrl, deleteQueue }))
 const lambdaName = mapper.lambdaName as jest.Mock
@@ -85,23 +85,28 @@ test("delete", async () => {
   deletePolicy.mockReturnValue({ promise: () => ({}) })
   deleteRole.mockReturnValue({ promise: () => ({}) })
   listEventSourceMappings.mockReturnValue({
-    promise: () => ({ EventSourceMappings: [{ UUID: id }] })
+    promise: () => ({ EventSourceMappings: [{ UUID: id }] }),
   })
   deleteEventSourceMapping.mockReturnValue({ promise: () => ({}) })
 
   await expect(del(cId)).resolves.toBe(undefined)
 
-  expect(deleteAlarms).toHaveBeenCalledWith({ AlarmNames: [qda, lamen, logen] })
+  expect(deleteAlarms).toHaveBeenCalledWith({
+    AlarmNames: [qda, lamen, logen],
+  })
   expect(deleteMetricFilter).toHaveBeenCalledWith({
     filterName: fn,
-    logGroupName: lgn
+    logGroupName: lgn,
   })
   expect(deleteLogGroup).toHaveBeenCalledWith({ logGroupName: lgn })
   expect(deleteFunction).toHaveBeenCalledWith({ FunctionName: ln })
   expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
   expect(deleteQueue).toHaveBeenCalledWith({ QueueUrl: url })
   expect(getRole).toHaveBeenCalledWith({ RoleName: rn })
-  expect(detachRolePolicy).toHaveBeenCalledWith({ RoleName: rn, PolicyArn: pa })
+  expect(detachRolePolicy).toHaveBeenCalledWith({
+    RoleName: rn,
+    PolicyArn: pa,
+  })
   expect(deletePolicy).toHaveBeenCalledWith({ PolicyArn: pa })
   expect(deleteRole).toHaveBeenCalledWith({ RoleName: rn })
   expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: ln })

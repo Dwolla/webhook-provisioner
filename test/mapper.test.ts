@@ -10,7 +10,7 @@ import {
   queueName,
   resultQueueName,
   roleName,
-  topicName
+  topicName,
 } from "../src/mapper"
 
 const CID = 123

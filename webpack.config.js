@@ -6,5 +6,8 @@ module.exports = {
   ...wp,
   entry: packageIndividually()
     ? slsw.lib.entries
-    : { ...slsw.lib.entries, server: "./server.ts" }
+    : { ...slsw.lib.entries, server: "./server.ts" },
+  optimization: {
+    concatenateModules: false,
+  },
 }

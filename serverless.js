@@ -32,10 +32,10 @@ module.exports = {
       Visibility: "external",
       DeployJobUrl: "${env:BUILD_URL, 'n/a'}",
       "org.label-schema.vcs-url": "${env:GIT_URL, 'n/a'}",
-      "org.label-schema.vcs-ref": "${env:GIT_COMMIT, 'n/a'}"
+      "org.label-schema.vcs-ref": "${env:GIT_COMMIT, 'n/a'}",
     },
     topicArn:
-      "arn:aws:sns:${self:provider.region}:#{AWS::AccountId}:cloudwatch-alarm-to-slack-topic-${self:provider.stage}"
+      "arn:aws:sns:${self:provider.region}:#{AWS::AccountId}:cloudwatch-alarm-to-slack-topic-${self:provider.stage}",
   },
   functions: {
     create: {
@@ -44,40 +44,40 @@ module.exports = {
         {
           Effect: "Allow",
           Action: ["logs:CreateLogGroup"],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: ["logs:PutMetricFilter", "logs:PutRetentionPolicy"],
-          Resource: "${self:custom.logStreamArn}"
+          Resource: "${self:custom.logStreamArn}",
         },
         {
           Effect: "Allow",
           Action: ["logs:DescribeLogGroups"],
-          Resource: "${self:custom.logGroupArn}"
+          Resource: "${self:custom.logGroupArn}",
         },
         {
           Effect: "Allow",
           Action: ["cloudwatch:PutMetricAlarm"],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: ["s3:ListBucket"],
-          Resource: "${self:custom.bucketArn}"
+          Resource: "${self:custom.bucketArn}",
         },
         {
           Effect: "Allow",
           Action: ["s3:GetObject"],
-          Resource: "${self:custom.keyArn}"
+          Resource: "${self:custom.keyArn}",
         },
         {
           Effect: "Allow",
           Action: ["sqs:GetQueueUrl", "sqs:GetQueueAttributes"],
           Resource: [
             { "Fn::GetAtt": ["ResultQueue98CD34E0", "Arn"] },
-            { "Fn::GetAtt": ["ErrorQueue2580A2D4", "Arn"] }
-          ]
+            { "Fn::GetAtt": ["ErrorQueue2580A2D4", "Arn"] },
+          ],
         },
         {
           Effect: "Allow",
@@ -85,44 +85,44 @@ module.exports = {
             "sqs:CreateQueue",
             "sqs:GetQueueAttributes",
             "sqs:GetQueueUrl",
-            "sqs:TagQueue"
+            "sqs:TagQueue",
           ],
-          Resource: "${self:custom.queueArn}"
+          Resource: "${self:custom.queueArn}",
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:ListEventSourceMappings",
-            "lambda:UpdateEventSourceMapping"
+            "lambda:UpdateEventSourceMapping",
           ],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: ["sns:CreateTopic"],
-          Resource: "${self:custom.topicArn}"
+          Resource: "${self:custom.topicArn}",
         },
         {
           Effect: "Allow",
           Action: ["iam:CreatePolicy"],
-          Resource: "${self:custom.policyArn}"
+          Resource: "${self:custom.policyArn}",
         },
         {
           Effect: "Allow",
           Action: ["lambda:CreateEventSourceMapping"],
           Resource: "*",
           Condition: {
-            ArnLike: { "lambda:FunctionArn": "${self:custom.lambdaArn}" }
-          }
+            ArnLike: { "lambda:FunctionArn": "${self:custom.lambdaArn}" },
+          },
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:CreateFunction",
             "lambda:PutFunctionConcurrency",
-            "lambda:TagResource"
+            "lambda:TagResource",
           ],
-          Resource: "${self:custom.lambdaArn}"
+          Resource: "${self:custom.lambdaArn}",
         },
         {
           Effect: "Allow",
@@ -130,12 +130,12 @@ module.exports = {
             "iam:AttachRolePolicy",
             "iam:CreateRole",
             "iam:PassRole",
-            "iam:TagRole"
+            "iam:TagRole",
           ],
-          Resource: "${self:custom.roleArn}"
-        }
+          Resource: "${self:custom.roleArn}",
+        },
       ],
-      timeout: 120
+      timeout: 120,
     },
     delete: {
       handler: "src/delete/handler.handle",
@@ -143,51 +143,51 @@ module.exports = {
         {
           Effect: "Allow",
           Action: ["logs:DeleteLogGroup", "logs:DeleteMetricFilter"],
-          Resource: "${self:custom.logStreamArn}"
+          Resource: "${self:custom.logStreamArn}",
         },
         {
           Effect: "Allow",
           Action: ["cloudwatch:DeleteAlarms"],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: ["sqs:DeleteQueue", "sqs:GetQueueUrl"],
-          Resource: "${self:custom.queueArn}"
+          Resource: "${self:custom.queueArn}",
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:ListEventSourceMappings",
-            "lambda:UpdateEventSourceMapping"
+            "lambda:UpdateEventSourceMapping",
           ],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: ["iam:DeletePolicy"],
-          Resource: "${self:custom.policyArn}"
+          Resource: "${self:custom.policyArn}",
         },
         {
           Effect: "Allow",
           Action: ["lambda:DeleteEventSourceMapping"],
           Resource: "${self:custom.eventSourceArn}",
           Condition: {
-            ArnLike: { "lambda:FunctionArn": "${self:custom.lambdaArn}" }
-          }
+            ArnLike: { "lambda:FunctionArn": "${self:custom.lambdaArn}" },
+          },
         },
         {
           Effect: "Allow",
           Action: ["lambda:DeleteFunction"],
-          Resource: "${self:custom.lambdaArn}"
+          Resource: "${self:custom.lambdaArn}",
         },
         {
           Effect: "Allow",
           Action: ["iam:DeleteRole", "iam:DetachRolePolicy", "iam:GetRole"],
-          Resource: "${self:custom.roleArn}"
-        }
+          Resource: "${self:custom.roleArn}",
+        },
       ],
-      timeout: 60
+      timeout: 60,
     },
     disable: {
       handler: "src/disable/handler.handle",
@@ -195,18 +195,18 @@ module.exports = {
         {
           Effect: "Allow",
           Action: ["sqs:GetQueueUrl", "sqs:PurgeQueue"],
-          Resource: "${self:custom.queueArn}"
+          Resource: "${self:custom.queueArn}",
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:ListEventSourceMappings",
-            "lambda:UpdateEventSourceMapping"
+            "lambda:UpdateEventSourceMapping",
           ],
-          Resource: "*"
-        }
+          Resource: "*",
+        },
       ],
-      timeout: 60
+      timeout: 60,
     },
     update: {
       handler: "src/update/handler.handle",
@@ -214,19 +214,19 @@ module.exports = {
         {
           Effect: "Allow",
           Action: ["sqs:GetQueueUrl", "sqs:SetQueueAttributes"],
-          Resource: "${self:custom.queueArn}"
+          Resource: "${self:custom.queueArn}",
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:GetFunctionConfiguration",
             "lambda:UpdateFunctionConfiguration",
-            "lambda:PutFunctionConcurrency"
+            "lambda:PutFunctionConcurrency",
           ],
-          Resource: "${self:custom.lambdaArn}"
-        }
+          Resource: "${self:custom.lambdaArn}",
+        },
       ],
-      timeout: 120
+      timeout: 120,
     },
     updateCode: {
       handler: "src/updateCode/handler.handle",
@@ -234,44 +234,44 @@ module.exports = {
         {
           Effect: "Allow",
           Action: ["s3:ListBucket"],
-          Resource: "${self:custom.bucketArn}"
+          Resource: "${self:custom.bucketArn}",
         },
         {
           Effect: "Allow",
           Action: ["s3:GetObject"],
-          Resource: "${self:custom.keyArn}"
+          Resource: "${self:custom.keyArn}",
         },
         {
           Effect: "Allow",
           Action: ["lambda:ListFunctions"],
-          Resource: "*"
+          Resource: "*",
         },
         {
           Effect: "Allow",
           Action: [
             "lambda:UpdateFunctionCode",
-            "lambda:UpdateFunctionConfiguration"
+            "lambda:UpdateFunctionConfiguration",
           ],
-          Resource: "${self:custom.lambdaArn}"
-        }
+          Resource: "${self:custom.lambdaArn}",
+        },
       ],
-      timeout: 120
-    }
+      timeout: 120,
+    },
   },
   package: { individually: "${file(./config.js):packageIndividually}" },
   plugins: [
     ...serverless.plugins,
     "serverless-iam-roles-per-function",
-    "serverless-pseudo-parameters"
+    "serverless-pseudo-parameters",
   ],
   provider: {
     ...serverless.provider,
     environment: {
       ...serverless.provider.environment,
       DEPLOYMENT_BUCKET: "${self:custom.bucket}",
-      ENVIRONMENT: "${self:provider.stage}"
+      ENVIRONMENT: "${self:provider.stage}",
     },
-    timeout: 30
+    timeout: 30,
   },
-  resources: "${file(./scripts/stack.yml)}"
+  resources: "${file(./scripts/stack.yml)}",
 }

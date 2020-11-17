@@ -3,7 +3,7 @@ import {
   calculateFuncTimeout,
   ignore404,
   validateConcurrency,
-  withErrHandling
+  withErrHandling,
 } from "../src/util"
 
 describe("validateConcurrency", () => {
@@ -70,7 +70,7 @@ describe("withErrHandling", () => {
       withErrHandling(async () => await Promise.resolve(exp))
     ).resolves.toEqual({
       body: JSON.stringify(exp),
-      statusCode: 200
+      statusCode: 200,
     })
   })
 
@@ -81,7 +81,7 @@ describe("withErrHandling", () => {
       withErrHandling(async () => await Promise.reject(new Error(err)))
     ).resolves.toEqual({
       body: JSON.stringify({ error: err }),
-      statusCode: 500
+      statusCode: 500,
     })
   })
 
@@ -90,7 +90,7 @@ describe("withErrHandling", () => {
       withErrHandling(async () => await Promise.reject(new Error()))
     ).resolves.toEqual({
       body: JSON.stringify({ error: "Unexpected error." }),
-      statusCode: 500
+      statusCode: 500,
     })
   })
 })

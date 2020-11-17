@@ -14,30 +14,30 @@ export const createQueue = async (
   await logRes<Queues>("Creating queue", async () => {
     const [rr, er] = await Promise.all([
       sqs.getQueueUrl({ QueueName: resultQueueName() }).promise(),
-      sqs.getQueueUrl({ QueueName: errorQueueName() }).promise()
+      sqs.getQueueUrl({ QueueName: errorQueueName() }).promise(),
     ])
     const rUrl = rr.QueueUrl as string
     const eUrl = er.QueueUrl as string
     const [ra, ea] = await Promise.all([getQueueArn(rUrl), getQueueArn(eUrl)])
-    const pUrl = (await sqs
-      .createQueue(toCreateQueue(cId, ea, funcTimeout))
-      .promise()).QueueUrl as string
+    const pUrl = (
+      await sqs.createQueue(toCreateQueue(cId, ea, funcTimeout)).promise()
+    ).QueueUrl as string
 
     log("Tagging queue and getting attributes", pUrl)
     const [pArn] = await Promise.all([
       getQueueArn(pUrl),
-      sqs.tagQueue(toTagQueue(cId, pUrl)).promise()
+      sqs.tagQueue(toTagQueue(cId, pUrl)).promise(),
     ])
     return {
       error: { url: eUrl, arn: ea },
       partner: { url: pUrl, arn: pArn },
-      result: { url: rUrl, arn: ra }
+      result: { url: rUrl, arn: ra },
     }
   })
 
 const getQueueArn = async (url: string) => {
-  const attrs = (await sqs
-    .getQueueAttributes(toGetQueueAttributes(url))
-    .promise()).Attributes
+  const attrs = (
+    await sqs.getQueueAttributes(toGetQueueAttributes(url)).promise()
+  ).Attributes
   return attrs && attrs.QueueArn ? attrs.QueueArn : ""
 }

@@ -13,7 +13,7 @@ const createEventSourceMapping = jest.fn()
 lam.mockImplementationOnce(() => ({
   createEventSourceMapping,
   createFunction,
-  putFunctionConcurrency
+  putFunctionConcurrency,
 }))
 import { createLambda } from "../../src/create/createLambda"
 
@@ -30,10 +30,10 @@ test("createLambda", async () => {
     queues: {
       error: { url: "eu", arn: "e" },
       partner: { url: "pu", arn: "p" },
-      result: { url: "ru", arn: "r" }
+      result: { url: "ru", arn: "r" },
     },
     role: { roleArn: "ra", roleName: "rn", policyArn: "pa" },
-    timeout: 10
+    timeout: 10,
   }
   toCreateFunc.mockReturnValue(cf)
   toPutFuncConcurrency.mockReturnValue(pfc)
@@ -44,7 +44,7 @@ test("createLambda", async () => {
 
   await expect(createLambda(req)).resolves.toEqual({
     arn,
-    eventSourceId: eId
+    eventSourceId: eId,
   })
 
   expect(toCreateFunc).toHaveBeenCalledWith(req)
