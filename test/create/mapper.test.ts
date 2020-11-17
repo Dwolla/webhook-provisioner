@@ -144,6 +144,7 @@ test("toQueueDepthAlarm", () => {
     Period: 900,
     Statistic: "Average",
     Threshold: 900,
+    TreatMissingData: "ignore"
   })
 })
 
@@ -164,6 +165,7 @@ test("toLambdaErrorAlarm", () => {
     Period: 60,
     Statistic: "Sum",
     Threshold: 1,
+    TreatMissingData: "ignore"
   })
 })
 
@@ -184,6 +186,7 @@ test("toLogErrorAlarm", () => {
     Period: 60,
     Statistic: "Sum",
     Threshold: 1,
+    TreatMissingData: "ignore"
   })
 })
 
