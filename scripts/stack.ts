@@ -177,7 +177,9 @@ const create = async () => {
   stack.node.applyAspect(new Tag("Creator", "serverless"))
   stack.node.applyAspect(new Tag("Team", "growth"))
   stack.node.applyAspect(new Tag("Visibility", "external"))
-  if (BUILD_URL) stack.node.applyAspect(new Tag("DeployJobUrl", BUILD_URL))
+  if (BUILD_URL) {
+    stack.node.applyAspect(new Tag("DeployJobUrl", BUILD_URL))
+  }
   if (GIT_URL) {
     stack.node.applyAspect(new Tag("org.label-schema.vcs-url", GIT_URL))
   }
