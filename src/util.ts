@@ -5,7 +5,7 @@ import { IConcurrency, Res } from "."
 import { toRes } from "./mapper"
 
 export const BATCH = 10
-export const DEPLOYMENT_BUCKET = envVar("DEPLOYMENT_BUCKET")
+export const DEPLOYMENT_BUCKET = envVar("SKRIPTS_DEPLOYMENT_BUCKET")
 export const ENV = envVar("ENVIRONMENT")
 export const PROJECT = "webhooks"
 export const REGION = process.env.AWS_REGION || "us-west-2"
