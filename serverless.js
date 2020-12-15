@@ -6,7 +6,7 @@ module.exports = {
   ...serverless,
   custom: {
     ...serverless.custom,
-    bucket: "${env:DEPLOYMENT_BUCKET, 'default'}",
+    bucket: "${env:SKRIPTS_DEPLOYMENT_BUCKET, 'default'}",
     bucketArn: "arn:aws:s3:::${self:custom.bucket}",
     eventSourceArn:
       "arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:event-source-mapping:*",
