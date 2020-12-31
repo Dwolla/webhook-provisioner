@@ -2,12 +2,10 @@
   "name": "webhook-provisioner",
   "version": "1.0.0",
   "scripts": {
-    "build": "sls webpack",
+    "build": "ENVIRONMENT=local sls webpack",
     "build:stack": "cd scripts && tsc && cdk synth Stack --app 'node stack.js' --no-version-reporting --strict > stack.yml",
-    "build:docker": "npm run build && cp Dockerfile .dockerignore .webpack/service",
     "clean": "skripts clean scripts --pattern '*.js'",
     "deploy": "npm run build:stack && sls deploy",
-    "deploy:docker": "npm run build:docker && cd .webpack/service && skripts docker-publish docker.dwolla.net/dwolla/webhook-provisioner --tag $(git rev-parse HEAD)",
     "format": "skripts format",
     "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket jest",
     "lint": "skripts lint --fix",
