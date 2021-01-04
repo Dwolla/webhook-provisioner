@@ -1,0 +1,64 @@
+stages:
+  build:
+    nodeLabel: nvm
+    steps:
+      - |
+        . ${NVM_DIR}/nvm.sh --no-use
+        nvm install
+        npm install
+        ENVIRONMENT=devint npm test
+    filesToStash:
+      - "**"
+  prepublish:
+    nodeLabel: nvm
+    steps:
+      - |
+        . ${NVM_DIR}/nvm.sh --no-use
+        nvm install
+        npm i --no-save
+        npm run build
+        cp Dockerfile .dockerignore .webpack/service
+    filesToStash:
+      - ".webpack/"
+  dockerPublish:
+    dockerImages:
+      - imageName: webhook-provisioner
+        dockerfile: .webpack/service/Dockerfile
+        context: .webpack/service
+        buildArgs:
+          VCS_REF: "{{GIT_COMMIT}}"
+          VCS_URL: "{{GIT_URL}}"
+          BUILD_DATE: "{{DATE}}"
+          VERSION: "{{GIT_COMMIT}}"
+        destinations:
+          - registry: docker.dwolla.net/dwolla
+            tags:
+              - "{{GIT_COMMIT}}"
+              - latest
+  deployDevInt:
+    nodeLabel: nvm-deployer
+    steps:
+      - |
+        . ${NVM_DIR}/nvm.sh --no-use
+        nvm install
+        npm install -g npm
+        npm install -g serverless
+        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage devint
+  deployUat:
+    nodeLabel: nvm-deployer
+    steps:
+      - |
+        . ${NVM_DIR}/nvm.sh --no-use
+        nvm install
+        npm install -g npm
+        npm install -g serverless
+        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage uat
+  deployProd:
+    nodeLabel: nvm-deployer
+    steps:
+      - |
+        . ${NVM_DIR}/nvm.sh --no-use
+        nvm install
+        npm install -g npm
+        npm install -g serverless
+        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage prod
