@@ -43,7 +43,7 @@ stages:
         nvm install
         npm install -g npm
         npm install -g serverless
-        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage devint
+        ENVIRONMENT=devint SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage devint
   deployUat:
     nodeLabel: nvm-deployer
     steps:
@@ -52,7 +52,7 @@ stages:
         nvm install
         npm install -g npm
         npm install -g serverless
-        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage uat
+        ENVIRONMENT=uat SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage uat
   deployProd:
     nodeLabel: nvm-deployer
     steps:
@@ -61,4 +61,4 @@ stages:
         nvm install
         npm install -g npm
         npm install -g serverless
-        SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage prod
+        ENVIRONMENT=prod SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted serverless deploy -v --stage prod
