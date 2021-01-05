@@ -7,7 +7,14 @@ import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
 import { ITopic, Topic } from "@aws-cdk/aws-sns"
 import { Queue } from "@aws-cdk/aws-sqs"
-import { App, Duration, Stack, StackProps, Tag } from "@aws-cdk/core"
+import {
+  App,
+  Duration,
+  Stack,
+  StackProps,
+  Tag,
+  CfnResource,
+} from "@aws-cdk/core"
 import { envVar, error } from "@therockstorm/utils"
 import SNS from "aws-sdk/clients/sns"
 import { name } from "../package.json"
@@ -84,12 +91,14 @@ class MyStack extends Stack {
     const ref = `${capped}Queue`
 
     const queue = () => {
-      new Queue(this, ref, {
+      const newQueue = new Queue(this, ref, {
         // tslint:disable-line
         queueName,
         retentionPeriod: Duration.days(14),
         visibilityTimeout: Duration.minutes(3),
       })
+      const cfnQueue = newQueue.node.defaultChild as CfnResource
+      cfnQueue.overrideLogicalId(ref)
     }
 
     queue()
