@@ -98,7 +98,13 @@ class MyStack extends Stack {
         visibilityTimeout: Duration.minutes(3),
       })
       const cfnQueue = newQueue.node.defaultChild as CfnResource
-      cfnQueue.overrideLogicalId(ref)
+      if (ref == "ResultQueue") {
+        cfnQueue.overrideLogicalId("ResultQueue98CD34E0")
+      } else if (ref == "ErrorQueue") {
+        cfnQueue.overrideLogicalId("ErrorQueue2580A2D4")
+      } else {
+        cfnQueue.overrideLogicalId(ref)
+      }
     }
 
     queue()
