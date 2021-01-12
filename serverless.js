@@ -75,8 +75,8 @@ module.exports = {
           Effect: "Allow",
           Action: ["sqs:GetQueueUrl", "sqs:GetQueueAttributes"],
           Resource: [
-            { "Fn::GetAtt": ["ResultQueue", "Arn"] },
-            { "Fn::GetAtt": ["ErrorQueue", "Arn"] },
+            { "Fn::GetAtt": ["ErrorQueue2580A2D4", "Arn"] },
+            { "Fn::GetAtt": ["ResultQueue98CD34E0", "Arn"] },
           ],
         },
         {
