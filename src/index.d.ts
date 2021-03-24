@@ -50,6 +50,7 @@ export type CreateFuncReq = Readonly<{
   queues: Queues
   role: Role
   timeout: number
+  maxRetries: number
 }>
 
 export interface IFunc {

@@ -1,6 +1,10 @@
 import { IConcurrencyEvent } from ".."
 import { latestCode } from "../latestCode"
-import { calculateFuncTimeout, validateConcurrency } from "../util"
+import {
+  calculateFuncTimeout,
+  validateConcurrency,
+  calculateMaxRetries,
+} from "../util"
 import { createAlarms } from "./createAlarms"
 import { createLambda } from "./createLambda"
 import { createLogGroup } from "./createLogGroup"
@@ -10,6 +14,7 @@ import { enableExisting } from "./enableExisting"
 
 export const create = async (evt: IConcurrencyEvent): Promise<string> => {
   const cId = evt.consumerId
+  const maxRetries = calculateMaxRetries()
   const existingUrl = await enableExisting(cId)
   if (existingUrl) return existingUrl
 
@@ -22,7 +27,15 @@ export const create = async (evt: IConcurrencyEvent): Promise<string> => {
     createLogGroup(cId),
   ])
   const role = await createRole(cId, logGroup, queues)
-  await createLambda({ cId, concurrency, location, queues, role, timeout })
+  await createLambda({
+    cId,
+    concurrency,
+    location,
+    queues,
+    role,
+    timeout,
+    maxRetries,
+  })
   await createAlarms(cId)
   return queues.partner.url
 }

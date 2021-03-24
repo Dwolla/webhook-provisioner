@@ -34,6 +34,7 @@ test("createLambda", async () => {
     },
     role: { roleArn: "ra", roleName: "rn", policyArn: "pa" },
     timeout: 10,
+    maxRetries: 8,
   }
   toCreateFunc.mockReturnValue(cf)
   toPutFuncConcurrency.mockReturnValue(pfc)

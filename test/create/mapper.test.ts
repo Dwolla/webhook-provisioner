@@ -203,6 +203,7 @@ test("toCreateFunc", () => {
     },
     role: { roleArn: "ra", roleName: "rn", policyArn: "pa" },
     timeout: 10,
+    maxRetries: 8,
   }
   lambdaName.mockReturnValue(ln)
 
@@ -215,6 +216,7 @@ test("toCreateFunc", () => {
         PARTNER_QUEUE_URL: req.queues.partner.url,
         RESULT_QUEUE_URL: req.queues.result.url,
         VERSION: req.location.version,
+        RETRIES_MAX: req.maxRetries.toString(),
       },
     },
     FunctionName: ln,

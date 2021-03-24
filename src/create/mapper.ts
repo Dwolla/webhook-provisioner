@@ -148,6 +148,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
       PARTNER_QUEUE_URL: req.queues.partner.url,
       RESULT_QUEUE_URL: req.queues.result.url,
       VERSION: req.location.version,
+      RETRIES_MAX: req.maxRetries.toString(),
     },
   },
   FunctionName: lambdaName(req.cId),

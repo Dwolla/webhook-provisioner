@@ -23,6 +23,7 @@ module.exports = {
     project,
     queueArn:
       "arn:aws:sqs:${self:provider.region}:#{AWS::AccountId}:${self:custom.project}-*-consumer-queue-${self:provider.stage}",
+    retriesMax: "${env:RETRIES_MAX, '8'}",
     roleArn:
       "arn:aws:iam::#{AWS::AccountId}:role/${self:custom.project}-*-role-${self:provider.region}-${self:provider.stage}",
     tags: {
@@ -270,6 +271,7 @@ module.exports = {
       ...serverless.provider.environment,
       DEPLOYMENT_BUCKET: "${self:custom.bucket}",
       ENVIRONMENT: "${self:provider.stage}",
+      RETRIES_MAX: "${self:custom:retriesMax",
     },
     timeout: 30,
   },

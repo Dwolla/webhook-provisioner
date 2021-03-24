@@ -52,7 +52,7 @@ stages:
         nvm install
         npm install -g npm
         npm install -g serverless
-        ENVIRONMENT=uat SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted npm run deploy
+        ENVIRONMENT=uat SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted RETRIES_MAX=1 npm run deploy
   deployProd:
     nodeLabel: nvm-deployer
     steps:
