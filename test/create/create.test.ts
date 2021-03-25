@@ -31,6 +31,7 @@ test("create", async () => {
   }
   const rl = { x: 3 }
   const cas = { x: 4 }
+  const rm = 8
   latestCode.mockResolvedValue(c)
   createQueue.mockResolvedValue(qs)
   createLogGroup.mockResolvedValue(lg)
@@ -52,6 +53,7 @@ test("create", async () => {
     queues: qs,
     role: rl,
     timeout: to,
+    maxRetries: rm,
   })
   expect(createAlarms).toHaveBeenCalledWith(evt.consumerId)
 })

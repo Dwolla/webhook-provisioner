@@ -12,6 +12,7 @@ export const REGION = process.env.AWS_REGION || "us-west-2"
 const HTTP_TIMEOUT = 10
 const QUEUE_SEND_TIMEOUT = 5
 const MISC_TIMEOUT = 2
+const RETRIES_MAX = envVar("RETRIES_MAX")
 
 export const validateConcurrency = (con: IConcurrency) => {
   con.reserved = validate(con.reserved, 1, 10, 2)
@@ -23,6 +24,10 @@ export const calculateFuncTimeout = (postCon: number | string): number => {
   const con = typeof postCon === "number" ? postCon : parseInt(postCon, 10)
   const serialApiReqs = Math.ceil(BATCH / Math.min(con || 1, BATCH))
   return HTTP_TIMEOUT * serialApiReqs + QUEUE_SEND_TIMEOUT * 2 + MISC_TIMEOUT
+}
+
+export const calculateMaxRetries = () => {
+  return parseInt(RETRIES_MAX || "8", 10)
 }
 
 export async function ignore404<T>(

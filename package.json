@@ -7,7 +7,7 @@
     "clean": "skripts clean scripts --pattern '*.js'",
     "deploy": "npm run build:stack && sls deploy",
     "format": "skripts format",
-    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket jest",
+    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket RETRIES_MAX=8 jest",
     "lint": "skripts lint --fix",
     "start": "npm run build && cd .webpack/service && node server.js",
     "test": "npm run lint && npm run build:stack && npm run jest && sls package",
