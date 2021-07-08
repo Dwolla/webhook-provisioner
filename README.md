@@ -4,7 +4,7 @@ Lambda functions to create, update, and delete partner-specific webhook SQS queu
 
 ## Setup
 
-- Clone the repository and run `npm install`
+- Clone the repository and run `npm ci`
 - Ensure your [AWS credentials are available](https://serverless.com/framework/docs/providers/aws/guide/credentials/)
 - Deploy with `ENVIRONMENT=your-env SKRIPTS_DEPLOYMENT_BUCKET=your-bucket npm run deploy`
 
