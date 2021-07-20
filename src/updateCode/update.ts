@@ -9,6 +9,7 @@ import { IFunc, Location } from ".."
 import { latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
 
+const chunkSize = 10
 const lam = new Lambda()
 const limit = pLimit(15)
 const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
@@ -26,10 +27,27 @@ export const updateAll = async (): Promise<IFunc[]> => {
   }
 
   const res = await Promise.all(
-    upd.map((f) => limit<any, IFunc>(() => update(f, lc)))
+    chunk(upd)
+      .map((updateChunks) => {
+        return updateChunks.map((f) =>
+          limit<any, IFunc>(async () => await update(f, lc))
+        )
+      })
+      .reduce((accumulator, value) => accumulator.concat(value), [])
   )
   log("Complete")
   return res
+}
+
+const chunk = (array: Fn[]): Fn[][] => {
+  const chunks: Fn[][] = []
+  const arrayLength = array.length
+  let arrayIndex = 0
+  let chunkOrdinal = 1
+  while (arrayIndex < arrayLength) {
+    chunks[chunkOrdinal++] = array.slice(arrayIndex, (arrayIndex += chunkSize))
+  }
+  return chunks
 }
 
 const allFuncs = async (): Promise<Fn[]> => {
