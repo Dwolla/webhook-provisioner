@@ -18,7 +18,7 @@
     "async-retry": "^1.2.3",
     "axios": "^0.19.0",
     "p-limit": "^2.2.1",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@aws-cdk/aws-cloudwatch": "^1.4.0",
