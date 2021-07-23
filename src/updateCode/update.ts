@@ -4,14 +4,16 @@ import Lambda, {
   EnvironmentVariables as EV,
   FunctionList,
 } from "aws-sdk/clients/lambda"
-import pLimit from "p-limit"
+import pThrottle from "p-throttle"
 import { IFunc, Location } from ".."
 import { latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
 
-const chunkSize = 10
 const lam = new Lambda()
-const limit = pLimit(15)
+const throttle = pThrottle({
+  limit: 15,
+  interval: 1000,
+})
 const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
@@ -26,28 +28,14 @@ export const updateAll = async (): Promise<IFunc[]> => {
     log(`Not updating ${notUpd.map((f) => f.name).join(", ")}`)
   }
 
-  const res = await Promise.all(
-    chunk(upd)
-      .map((updateChunks) => {
-        return updateChunks.map((f) =>
-          limit<any, IFunc>(async () => await update(f, lc))
-        )
-      })
-      .reduce((accumulator, value) => accumulator.concat(value), [])
-  )
+  const throttled = throttle((func: Fn) => {
+    return update(func, lc)
+  })
+
+  const res = await Promise.all(upd.map((f) => throttled(f)))
+
   log("Complete")
   return res
-}
-
-const chunk = (array: Fn[]): Fn[][] => {
-  const chunks: Fn[][] = []
-  const arrayLength = array.length
-  let arrayIndex = 0
-  let chunkOrdinal = 1
-  while (arrayIndex < arrayLength) {
-    chunks[chunkOrdinal++] = array.slice(arrayIndex, (arrayIndex += chunkSize))
-  }
-  return chunks
 }
 
 const allFuncs = async (): Promise<Fn[]> => {
