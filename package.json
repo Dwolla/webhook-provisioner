@@ -18,6 +18,7 @@
     "async-retry": "^1.2.3",
     "axios": "^0.19.0",
     "p-limit": "^2.2.1",
+    "p-throttle": "^4.1.1",
     "source-map-support": "^0.5.13"
   },
   "devDependencies": {

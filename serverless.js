@@ -271,7 +271,7 @@ module.exports = {
       ...serverless.provider.environment,
       DEPLOYMENT_BUCKET: "${self:custom.bucket}",
       ENVIRONMENT: "${self:provider.stage}",
-      RETRIES_MAX: "${self:custom:retriesMax",
+      RETRIES_MAX: "${self:custom:retriesMax}",
     },
     timeout: 30,
   },
