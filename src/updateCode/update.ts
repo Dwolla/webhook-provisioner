@@ -11,8 +11,8 @@ import { calculateFuncTimeout, ENV, logRes } from "../util"
 
 const lam = new Lambda()
 const throttle = pThrottle({
-  limit: 15,
-  interval: 1000,
+  limit: 10,
+  interval: 2500,
 })
 const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
