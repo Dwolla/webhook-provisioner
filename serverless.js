@@ -274,6 +274,7 @@ module.exports = {
       RETRIES_MAX: "${self:custom.retriesMax}",
     },
     timeout: 30,
+    runtime: "nodejs16.x",
   },
   resources: "${file(./scripts/stack.yml)}",
 }
