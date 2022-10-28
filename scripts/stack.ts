@@ -204,4 +204,4 @@ const create = async () => {
   app.synth()
 }
 
-create().catch((err) => error({ code: err.code, message: err.message }))
+create()
