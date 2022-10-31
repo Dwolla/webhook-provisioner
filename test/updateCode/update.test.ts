@@ -88,7 +88,7 @@ test("update", async () => {
     Environment: { Variables: { CONCURRENCY: con, VERSION: c.version } },
     FunctionName: fn,
     MemorySize: 128,
-    Runtime: "nodejs12.x",
+    Runtime: "nodejs16.x",
     Timeout: 32,
   })
 })

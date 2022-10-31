@@ -156,7 +156,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
   MemorySize: 128,
   Publish: true,
   Role: req.role.roleArn,
-  Runtime: "nodejs12.x",
+  Runtime: "nodejs16.x",
   Tags: tags(req.cId, false) as LTags,
   Timeout: req.timeout,
 })
