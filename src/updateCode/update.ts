@@ -82,6 +82,7 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
         S3Key: lc.key,
       })
       .promise()
+    await lam.waitFor("functionUpdatedV2", { FunctionName: f.name }).promise()
     const arn = (
       await lam
         .updateFunctionConfiguration({
