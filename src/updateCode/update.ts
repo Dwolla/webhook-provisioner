@@ -28,11 +28,11 @@ export const updateAll = async (): Promise<IFunc[]> => {
     log(`Not updating ${notUpd.map((f) => f.name).join(", ")}`)
   }
 
-  const throttled = throttle((func: Fn) => {
-    return update(func, lc)
+  const throttled = throttle(async (func: Fn) => {
+    return await update(func, lc)
   })
 
-  const res = await Promise.all(upd.map((f) => throttled(f)))
+  const res = await Promise.all(upd.map(async (f) => await throttled(f)))
 
   log("Complete")
   return res
