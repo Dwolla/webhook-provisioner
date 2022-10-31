@@ -17,6 +17,8 @@ const throttle = pThrottle({
 const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
+const FULFILLED = "fulfilled"
+const REJECTED = "rejected"
 
 export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFuncs()])
@@ -32,10 +34,21 @@ export const updateAll = async (): Promise<IFunc[]> => {
     return await update(func, lc)
   })
 
-  const res = await Promise.all(upd.map(async (f) => await throttled(f)))
+  const results = await Promise.allSettled(
+    upd.map(async (f) => await throttled(f))
+  )
+
+  results.forEach((res, i) => {
+    if (res.status === REJECTED) {
+      const reason = (res as PromiseRejectedResult).reason
+      log(`Update failed for ${upd[i].name}. Reason: ${reason}`)
+    }
+  })
 
   log("Complete")
-  return res
+  return results
+    .filter((r) => r.status === FULFILLED)
+    .map((r) => (r as PromiseFulfilledResult<IFunc>).value)
 }
 
 const allFuncs = async (): Promise<Fn[]> => {
