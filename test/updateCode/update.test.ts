@@ -6,11 +6,13 @@ jest.mock("../../src/latestCode")
 const updateFunctionCode = jest.fn()
 const updateFunctionConfiguration = jest.fn()
 const listFunctions = jest.fn()
+const waitFor = jest.fn()
 const lam = (Lambda as unknown) as jest.Mock
 lam.mockImplementationOnce(() => ({
   listFunctions,
   updateFunctionCode,
   updateFunctionConfiguration,
+  waitFor,
 }))
 const latestCode = lc.latestCode as jest.Mock
 import { updateAll } from "../../src/updateCode/update"
@@ -61,6 +63,7 @@ test("update", async () => {
   listFunctions.mockReturnValueOnce({ promise: () => ({ Functions: [] }) })
   latestCode.mockResolvedValue(c)
   updateFunctionCode.mockReturnValue({ promise: () => ({}) })
+  waitFor.mockReturnValue({ promise: () => ({}) })
   updateFunctionConfiguration.mockReturnValue({
     promise: () => ({ FunctionArn: arn }),
   })
@@ -76,6 +79,10 @@ test("update", async () => {
     Publish: true,
     S3Bucket: c.bucket,
     S3Key: c.key,
+  })
+  expect(waitFor).toHaveBeenCalledTimes(1)
+  expect(waitFor).toHaveBeenCalledWith("functionUpdatedV2", {
+    FunctionName: fn,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: { Variables: { CONCURRENCY: con, VERSION: c.version } },

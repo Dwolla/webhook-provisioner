@@ -17,6 +17,8 @@ const throttle = pThrottle({
 const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
+const FULFILLED = "fulfilled"
+const REJECTED = "rejected"
 
 export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFuncs()])
@@ -28,14 +30,25 @@ export const updateAll = async (): Promise<IFunc[]> => {
     log(`Not updating ${notUpd.map((f) => f.name).join(", ")}`)
   }
 
-  const throttled = throttle((func: Fn) => {
-    return update(func, lc)
+  const throttled = throttle(async (func: Fn) => {
+    return await update(func, lc)
   })
 
-  const res = await Promise.all(upd.map((f) => throttled(f)))
+  const results = await Promise.allSettled(
+    upd.map(async (f) => await throttled(f))
+  )
+
+  results.forEach((res, i) => {
+    if (res.status === REJECTED) {
+      const reason = (res as PromiseRejectedResult).reason
+      log(`Update failed for ${upd[i].name}. Reason: ${reason}`)
+    }
+  })
 
   log("Complete")
-  return res
+  return results
+    .filter((r) => r.status === FULFILLED)
+    .map((r) => (r as PromiseFulfilledResult<IFunc>).value)
 }
 
 const allFuncs = async (): Promise<Fn[]> => {
@@ -82,6 +95,8 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
         S3Key: lc.key,
       })
       .promise()
+    log(`updateFunctionCode complete for ${f.name}`)
+    await lam.waitFor("functionUpdatedV2", { FunctionName: f.name }).promise()
     const arn = (
       await lam
         .updateFunctionConfiguration({

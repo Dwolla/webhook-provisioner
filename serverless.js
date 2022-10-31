@@ -252,6 +252,7 @@ module.exports = {
           Action: [
             "lambda:UpdateFunctionCode",
             "lambda:UpdateFunctionConfiguration",
+            "lambda:GetFunction",
           ],
           Resource: "${self:custom.lambdaArn}",
         },
