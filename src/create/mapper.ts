@@ -47,6 +47,7 @@ interface IAlarmProps {
   period?: number
   statistic?: string
   threshold?: number
+  treatMissingData?: string
 }
 
 export const toCreateQueue = (
@@ -137,6 +138,7 @@ export const toLogErrorAlarm = (cId: ConsumerId, topicArn: string) =>
     alarmName: logErrorAlarmName(cId),
     metricName: metricName(cId),
     namespace: "LogMetrics",
+    treatMissingData: "missing",
   })
 
 export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
@@ -259,5 +261,5 @@ const toPutMetricAlarm = (
   Period: props.period || 60,
   Statistic: props.statistic || "Sum",
   Threshold: props.threshold || 1,
-  TreatMissingData: "ignore",
+  TreatMissingData: props.treatMissingData || "ignore",
 })

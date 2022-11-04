@@ -186,7 +186,7 @@ test("toLogErrorAlarm", () => {
     Period: 60,
     Statistic: "Sum",
     Threshold: 1,
-    TreatMissingData: "ignore",
+    TreatMissingData: "missing",
   })
 })
 
