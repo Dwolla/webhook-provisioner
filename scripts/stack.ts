@@ -2,7 +2,6 @@ import {
   ComparisonOperator,
   DimensionHash,
   Metric,
-  TreatMissingData,
 } from "@aws-cdk/aws-cloudwatch"
 import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
@@ -30,7 +29,6 @@ type AlarmProps = Readonly<{
   period?: Duration
   statistic?: string
   threshold?: number
-  treatMissingData?: TreatMissingData
 }>
 
 type QueueProps = Readonly<{
@@ -154,7 +152,6 @@ class MyStack extends Stack {
       alarmName: metricName,
       metricName,
       namespace,
-      treatMissingData: TreatMissingData.NOT_BREACHING,
     })
   }
 
@@ -173,7 +170,6 @@ class MyStack extends Stack {
         period: props.period || Duration.minutes(1),
         statistic: props.statistic || "Sum",
         threshold: props.threshold || 1,
-        treatMissingData: props.treatMissingData || TreatMissingData.MISSING,
       })
       .addAlarmAction(new SnsAction(this.topic))
 }
