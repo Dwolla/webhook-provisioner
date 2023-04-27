@@ -23,44 +23,47 @@ const queueName = mapper.queueName as jest.Mock
 import { update } from "../../src/update/update"
 
 test("update", async () => {
-  const arn = "a"
-  const evt = { consumerIds: [123], concurrency: { reserved: 2, post: 5 } }
-  const ln = "ln"
-  const qn = "qn"
-  const qu = "qu"
-  const vs = { x: 1 }
-  lambdaName.mockReturnValue(ln)
-  queueName.mockReturnValue(qn)
+  const resourceName = "a"
+  const updateEvent = {
+    consumerIds: [123],
+    concurrency: { reserved: 2, post: 5 },
+  }
+  const lName = "ln"
+  const qName = "qn"
+  const qUrl = "qu"
+  const variables = { x: 1 }
+  lambdaName.mockReturnValue(lName)
+  queueName.mockReturnValue(qName)
   putFunctionConcurrency.mockReturnValue({ promise: () => ({}) })
   getQueueUrl.mockReturnValue({
-    promise: () => ({ QueueUrl: qu }),
+    promise: () => ({ QueueUrl: qUrl }),
   })
   updateFunctionConfiguration.mockReturnValue({
-    promise: () => ({ FunctionArn: arn }),
+    promise: () => ({ FunctionArn: resourceName }),
   })
   getFunctionConfiguration.mockReturnValue({
-    promise: () => ({ Environment: { Variables: vs } }),
+    promise: () => ({ Environment: { Variables: variables } }),
   })
   setQueueAttributes.mockReturnValue({
     promise: () => ({}),
   })
 
-  await expect(update(evt)).resolves.toEqual([{ arn }])
+  await expect(update(updateEvent)).resolves.toEqual([{ arn: resourceName }])
 
-  expect(queueName).toHaveBeenCalledWith(evt.consumerIds[0])
-  expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
+  expect(queueName).toHaveBeenCalledWith(updateEvent.consumerIds[0])
+  expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qName })
   expect(setQueueAttributes).toHaveBeenCalledWith({
     Attributes: { VisibilityTimeout: "192" },
-    QueueUrl: qu,
+    QueueUrl: qUrl,
   })
-  expect(getFunctionConfiguration).toHaveBeenCalledWith({ FunctionName: ln })
+  expect(getFunctionConfiguration).toHaveBeenCalledWith({ FunctionName: lName })
   expect(putFunctionConcurrency).toHaveBeenCalledWith({
-    FunctionName: ln,
+    FunctionName: lName,
     ReservedConcurrentExecutions: 2,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
-    Environment: { Variables: { ...vs, CONCURRENCY: "5" } },
-    FunctionName: ln,
+    Environment: { Variables: { ...variables, CONCURRENCY: "5" } },
+    FunctionName: lName,
     Timeout: 32,
   })
 })

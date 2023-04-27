@@ -21,31 +21,31 @@ cwl.mockImplementationOnce(() => ({
 import { createLogGroup as clg } from "../../src/create/createLogGroup"
 
 test("createLogGroup", async () => {
-  const arn = "arn"
-  const cId = 123
-  const cl = { x: 0 }
-  const dl = { x: 1 }
-  const pm = { x: 2 }
-  const rp = { x: 3 }
-  toCreateLogGroup.mockReturnValue(cl)
-  toDescribeLogGroups.mockReturnValue(dl)
-  toPutMetricFilter.mockReturnValue(pm)
-  toPutRetentionPolicy.mockReturnValue(rp)
+  const resourceName = "arn"
+  const consumerId = 123
+  const createLogGroupRequest = { x: 0 }
+  const describeLogGroupRequest = { x: 1 }
+  const metricFilter = { x: 2 }
+  const retentionPolicy = { x: 3 }
+  toCreateLogGroup.mockReturnValue(createLogGroupRequest)
+  toDescribeLogGroups.mockReturnValue(describeLogGroupRequest)
+  toPutMetricFilter.mockReturnValue(metricFilter)
+  toPutRetentionPolicy.mockReturnValue(retentionPolicy)
   createLogGroup.mockReturnValue({ promise: () => ({}) })
   putRetentionPolicy.mockReturnValue({ promise: () => ({}) })
   putMetricFilter.mockReturnValue({ promise: () => ({}) })
   describeLogGroups.mockReturnValue({
-    promise: () => ({ logGroups: [{ arn }] }),
+    promise: () => ({ logGroups: [{ arn: resourceName }] }),
   })
 
-  await expect(clg(cId)).resolves.toEqual({ arn })
+  await expect(clg(consumerId)).resolves.toEqual({ arn: resourceName })
 
-  expect(toCreateLogGroup).toHaveBeenCalledWith(cId)
-  expect(createLogGroup).toHaveBeenCalledWith(cl)
-  expect(putRetentionPolicy).toHaveBeenCalledWith(rp)
-  expect(toPutMetricFilter).toHaveBeenCalledWith(cId)
-  expect(toPutRetentionPolicy).toHaveBeenCalledWith(cId)
-  expect(putMetricFilter).toHaveBeenCalledWith(pm)
-  expect(toDescribeLogGroups).toHaveBeenCalledWith(cId)
-  expect(describeLogGroups).toHaveBeenCalledWith(dl)
+  expect(toCreateLogGroup).toHaveBeenCalledWith(consumerId)
+  expect(createLogGroup).toHaveBeenCalledWith(createLogGroupRequest)
+  expect(putRetentionPolicy).toHaveBeenCalledWith(retentionPolicy)
+  expect(toPutMetricFilter).toHaveBeenCalledWith(consumerId)
+  expect(toPutRetentionPolicy).toHaveBeenCalledWith(consumerId)
+  expect(putMetricFilter).toHaveBeenCalledWith(metricFilter)
+  expect(toDescribeLogGroups).toHaveBeenCalledWith(consumerId)
+  expect(describeLogGroups).toHaveBeenCalledWith(describeLogGroupRequest)
 })

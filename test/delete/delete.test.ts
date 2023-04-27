@@ -53,34 +53,34 @@ const roleName = mapper.roleName as jest.Mock
 import { del } from "../../src/delete/delete"
 
 test("delete", async () => {
-  const cId = 123
-  const ln = "ln"
+  const consumerId = 123
+  const lName = "ln"
   const lamen = "lamen"
   const logen = "logen"
-  const fn = "fn"
-  const lgn = "lgn"
-  const qn = "qn"
-  const qda = "qda"
-  const ra = "role-arn-role"
-  const pa = "policy-arn-policy"
-  const rn = "rn"
-  const url = "url"
+  const filter = "fn"
+  const logGroup = "lgn"
+  const queue = "qn"
+  const queueDepthAlarm = "qda"
+  const arnRole = "role-arn-role"
+  const policyArn = "policy-arn-policy"
+  const role = "rn"
+  const queueUrl = "url"
   const id = "id"
-  lambdaName.mockReturnValue(ln)
+  lambdaName.mockReturnValue(lName)
   lambdaErrorAlarmName.mockReturnValue(lamen)
   logErrorAlarmName.mockReturnValue(logen)
-  filterName.mockReturnValue(fn)
-  logGroupName.mockReturnValue(lgn)
-  queueName.mockReturnValue(qn)
-  queueDepthAlarmName.mockReturnValue(qda)
-  roleName.mockReturnValue(rn)
+  filterName.mockReturnValue(filter)
+  logGroupName.mockReturnValue(logGroup)
+  queueName.mockReturnValue(queue)
+  queueDepthAlarmName.mockReturnValue(queueDepthAlarm)
+  roleName.mockReturnValue(role)
   deleteAlarms.mockReturnValue({ promise: () => ({}) })
   deleteMetricFilter.mockReturnValue({ promise: () => ({}) })
   deleteLogGroup.mockReturnValue({ promise: () => ({}) })
   deleteFunction.mockReturnValue({ promise: () => ({}) })
-  getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: url }) })
+  getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: queueUrl }) })
   deleteQueue.mockReturnValue({ promise: () => ({}) })
-  getRole.mockReturnValue({ promise: () => ({ Role: { Arn: ra } }) })
+  getRole.mockReturnValue({ promise: () => ({ Role: { Arn: arnRole } }) })
   detachRolePolicy.mockReturnValue({ promise: () => ({}) })
   deletePolicy.mockReturnValue({ promise: () => ({}) })
   deleteRole.mockReturnValue({ promise: () => ({}) })
@@ -89,26 +89,26 @@ test("delete", async () => {
   })
   deleteEventSourceMapping.mockReturnValue({ promise: () => ({}) })
 
-  await expect(del(cId)).resolves.toBe(undefined)
+  await expect(del(consumerId)).resolves.toBe(undefined)
 
   expect(deleteAlarms).toHaveBeenCalledWith({
-    AlarmNames: [qda, lamen, logen],
+    AlarmNames: [queueDepthAlarm, lamen, logen],
   })
   expect(deleteMetricFilter).toHaveBeenCalledWith({
-    filterName: fn,
-    logGroupName: lgn,
+    filterName: filter,
+    logGroupName: logGroup,
   })
-  expect(deleteLogGroup).toHaveBeenCalledWith({ logGroupName: lgn })
-  expect(deleteFunction).toHaveBeenCalledWith({ FunctionName: ln })
-  expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
-  expect(deleteQueue).toHaveBeenCalledWith({ QueueUrl: url })
-  expect(getRole).toHaveBeenCalledWith({ RoleName: rn })
+  expect(deleteLogGroup).toHaveBeenCalledWith({ logGroupName: logGroup })
+  expect(deleteFunction).toHaveBeenCalledWith({ FunctionName: lName })
+  expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: queue })
+  expect(deleteQueue).toHaveBeenCalledWith({ QueueUrl: queueUrl })
+  expect(getRole).toHaveBeenCalledWith({ RoleName: role })
   expect(detachRolePolicy).toHaveBeenCalledWith({
-    RoleName: rn,
-    PolicyArn: pa,
+    RoleName: role,
+    PolicyArn: policyArn,
   })
-  expect(deletePolicy).toHaveBeenCalledWith({ PolicyArn: pa })
-  expect(deleteRole).toHaveBeenCalledWith({ RoleName: rn })
-  expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: ln })
+  expect(deletePolicy).toHaveBeenCalledWith({ PolicyArn: policyArn })
+  expect(deleteRole).toHaveBeenCalledWith({ RoleName: role })
+  expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: lName })
   expect(deleteEventSourceMapping).toHaveBeenCalledWith({ UUID: id })
 })

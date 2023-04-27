@@ -15,12 +15,12 @@ const getQueueUrl = jest.fn()
 const lamInst = jest.fn()
 lam.mockImplementationOnce(() => lamInst)
 sqs.mockImplementationOnce(() => ({ getQueueUrl }))
-import { enableExisting as ee } from "../../src/create/enableExisting"
+import { enableExisting } from "../../src/create/enableExisting"
 
 describe("enableExisting", () => {
-  const cId = 123
-  const qn = "qn"
-  const qu = "qu"
+  const consumerId = 123
+  const qName = "qn"
+  const qUrl = "qu"
 
   afterEach(() => {
     getQueueUrl.mockClear()
@@ -28,28 +28,28 @@ describe("enableExisting", () => {
   })
 
   it("returns queueUrl", async () => {
-    queueName.mockReturnValue(qn)
+    queueName.mockReturnValue(qName)
     update.mockResolvedValueOnce(true)
-    getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: qu }) })
+    getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: qUrl }) })
 
-    await expect(ee(cId)).resolves.toEqual(qu)
+    await expect(enableExisting(consumerId)).resolves.toEqual(qUrl)
 
-    expect(update).toHaveBeenCalledWith(lamInst, cId, true)
-    expect(queueName).toHaveBeenCalledWith(cId)
+    expect(update).toHaveBeenCalledWith(lamInst, consumerId, true)
+    expect(queueName).toHaveBeenCalledWith(consumerId)
   })
 
   it("returns undefined if no url", async () => {
-    queueName.mockReturnValue(qn)
+    queueName.mockReturnValue(qName)
     update.mockResolvedValueOnce(true)
     getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: undefined }) })
 
-    await expect(ee(cId)).resolves.toBe(undefined)
+    await expect(enableExisting(consumerId)).resolves.toBe(undefined)
   })
 
   it("returns undefined if update returns false", async () => {
     update.mockResolvedValueOnce(false)
 
-    await expect(ee(cId)).resolves.toBe(undefined)
+    await expect(enableExisting(consumerId)).resolves.toBe(undefined)
 
     expect(getQueueUrl).not.toHaveBeenCalled()
   })

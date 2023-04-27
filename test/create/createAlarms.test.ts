@@ -16,19 +16,19 @@ sns.mockImplementationOnce(() => ({ createTopic }))
 import { createAlarms as cas } from "../../src/create/createAlarms"
 
 test("createAlarms", async () => {
-  const ta = "ta"
-  const cId = 123
-  const lamA = { x: 0 }
-  const logA = { x: 1 }
-  toLambdaErrorAlarm.mockReturnValue(lamA)
-  toLogErrorAlarm.mockReturnValue(logA)
-  createTopic.mockReturnValue({ promise: () => ({ TopicArn: ta }) })
+  const alarmTopicName = "ta"
+  const consumerId = 123
+  const lambdaAlarmMetric = { x: 0 }
+  const logAlarmMetric = { x: 1 }
+  toLambdaErrorAlarm.mockReturnValue(lambdaAlarmMetric)
+  toLogErrorAlarm.mockReturnValue(logAlarmMetric)
+  createTopic.mockReturnValue({ promise: () => ({ TopicArn: alarmTopicName }) })
   putMetricAlarm.mockReturnValue({ promise: () => ({}) })
 
-  await expect(cas(cId)).resolves.toEqual(undefined)
+  await expect(cas(consumerId)).resolves.toEqual(undefined)
 
-  expect(toLambdaErrorAlarm).toHaveBeenCalledWith(cId, ta)
-  expect(toLogErrorAlarm).toHaveBeenCalledWith(cId, ta)
-  expect(putMetricAlarm).toHaveBeenCalledWith(lamA)
-  expect(putMetricAlarm).toHaveBeenCalledWith(logA)
+  expect(toLambdaErrorAlarm).toHaveBeenCalledWith(consumerId, alarmTopicName)
+  expect(toLogErrorAlarm).toHaveBeenCalledWith(consumerId, alarmTopicName)
+  expect(putMetricAlarm).toHaveBeenCalledWith(lambdaAlarmMetric)
+  expect(putMetricAlarm).toHaveBeenCalledWith(logAlarmMetric)
 })

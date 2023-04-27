@@ -21,39 +21,43 @@ const createRole = cr.createRole as jest.Mock
 import { create } from "../../src/create/create"
 
 test("create", async () => {
-  const evt = { consumerId: 123, concurrency: { reserved: 2, post: 5 } }
-  const to = 32
-  const c = { x: 0 }
-  const lg = { x: 1 }
-  const qs = {
+  const createEvent = { consumerId: 123, concurrency: { reserved: 2, post: 5 } }
+  const timeout = 32
+  const lCode = { x: 0 }
+  const logGroup = { x: 1 }
+  const queues = {
     partner: { url: "pu", arn: "p" },
     result: { url: "ru", arn: "a" },
   }
-  const rl = { x: 3 }
-  const cas = { x: 4 }
-  const rm = 8
-  latestCode.mockResolvedValue(c)
-  createQueue.mockResolvedValue(qs)
-  createLogGroup.mockResolvedValue(lg)
-  createRole.mockResolvedValue(rl)
+  const roleResource = { x: 3 }
+  const createAlarmsResponse = { x: 4 }
+  const maxRetries = 8
+  latestCode.mockResolvedValue(lCode)
+  createQueue.mockResolvedValue(queues)
+  createLogGroup.mockResolvedValue(logGroup)
+  createRole.mockResolvedValue(roleResource)
   createLambda.mockResolvedValue({})
-  createAlarms.mockResolvedValue(cas)
+  createAlarms.mockResolvedValue(createAlarmsResponse)
 
-  await expect(create(evt)).resolves.toEqual(qs.partner.url)
+  await expect(create(createEvent)).resolves.toEqual(queues.partner.url)
 
   expect(latestCode).toHaveBeenCalledTimes(1)
   expect(createQueue).toHaveBeenCalledTimes(1)
-  expect(createQueue).toHaveBeenCalledWith(evt.consumerId, to)
-  expect(createLogGroup).toHaveBeenCalledWith(evt.consumerId)
-  expect(createRole).toHaveBeenCalledWith(evt.consumerId, lg, qs)
+  expect(createQueue).toHaveBeenCalledWith(createEvent.consumerId, timeout)
+  expect(createLogGroup).toHaveBeenCalledWith(createEvent.consumerId)
+  expect(createRole).toHaveBeenCalledWith(
+    createEvent.consumerId,
+    logGroup,
+    queues
+  )
   expect(createLambda).toHaveBeenCalledWith({
-    cId: evt.consumerId,
-    concurrency: evt.concurrency,
-    location: c,
-    queues: qs,
-    role: rl,
-    timeout: to,
-    maxRetries: rm,
+    cId: createEvent.consumerId,
+    concurrency: createEvent.concurrency,
+    location: lCode,
+    queues: queues,
+    role: roleResource,
+    timeout: timeout,
+    maxRetries: maxRetries,
   })
-  expect(createAlarms).toHaveBeenCalledWith(evt.consumerId)
+  expect(createAlarms).toHaveBeenCalledWith(createEvent.consumerId)
 })

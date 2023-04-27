@@ -30,14 +30,14 @@ import {
 } from "../../src/create/mapper"
 
 const BATCH = 10
-const CID = 123
+const CONSUMER_ID = 123
 const ENV = "test"
 const FUNCTION_TIMEOUT_SEC = 11 * BATCH
 const PROJECT = "webhooks"
 const URL = "url"
 const TOPIC_ARN = "arn:aws:sns:us-west-2:000000000000:webhooks-topic-test"
 const TAGS = {
-  ConsumerId: CID.toString(),
+  ConsumerId: CONSUMER_ID.toString(),
   Creator: "webhook-provisioner",
   Environment: ENV,
   Project: PROJECT,
@@ -50,7 +50,7 @@ test("toCreateQueue", () => {
   const dlqArn = "dlqArn"
   queueName.mockReturnValue(qn)
 
-  expect(toCreateQueue(CID, dlqArn, FUNCTION_TIMEOUT_SEC)).toEqual({
+  expect(toCreateQueue(CONSUMER_ID, dlqArn, FUNCTION_TIMEOUT_SEC)).toEqual({
     Attributes: {
       MessageRetentionPeriod: "1209600",
       RedrivePolicy: JSON.stringify({
@@ -64,7 +64,7 @@ test("toCreateQueue", () => {
 })
 
 test("toTagQueue", () =>
-  expect(toTagQueue(CID, URL)).toEqual({
+  expect(toTagQueue(CONSUMER_ID, URL)).toEqual({
     QueueUrl: URL,
     Tags: TAGS,
   }))
@@ -79,7 +79,7 @@ test("toCreateLogGroup", () => {
   const lgn = "lgn"
   logGroupName.mockReturnValue(lgn)
 
-  expect(toCreateLogGroup(CID)).toEqual({
+  expect(toCreateLogGroup(CONSUMER_ID)).toEqual({
     logGroupName: lgn,
     tags: TAGS,
   })
@@ -89,7 +89,7 @@ test("toPutRetentionPolicy", () => {
   const lgn = "lgn"
   logGroupName.mockReturnValue(lgn)
 
-  expect(toPutRetentionPolicy(CID)).toEqual({
+  expect(toPutRetentionPolicy(CONSUMER_ID)).toEqual({
     logGroupName: lgn,
     retentionInDays: 365,
   })
@@ -99,7 +99,7 @@ test("toDescribeLogGroups", () => {
   const lgn = "lgn"
   logGroupName.mockReturnValue(lgn)
 
-  expect(toDescribeLogGroups(CID)).toEqual({
+  expect(toDescribeLogGroups(CONSUMER_ID)).toEqual({
     limit: 1,
     logGroupNamePrefix: lgn,
   })
@@ -113,7 +113,7 @@ test("toPutMetricFilter", () => {
   filterName.mockReturnValue(fn)
   metricName.mockReturnValue(mn)
 
-  expect(toPutMetricFilter(CID)).toEqual({
+  expect(toPutMetricFilter(CONSUMER_ID)).toEqual({
     filterName: fn,
     filterPattern: '"[error]"',
     logGroupName: lgn,
@@ -133,7 +133,7 @@ test("toQueueDepthAlarm", () => {
   queueName.mockReturnValue(qn)
   queueDepthAlarmName.mockReturnValue(qda)
 
-  expect(toQueueDepthAlarm(CID, TOPIC_ARN)).toEqual({
+  expect(toQueueDepthAlarm(CONSUMER_ID, TOPIC_ARN)).toEqual({
     AlarmActions: [TOPIC_ARN],
     AlarmName: qda,
     ComparisonOperator: "GreaterThanOrEqualToThreshold",
@@ -154,7 +154,7 @@ test("toLambdaErrorAlarm", () => {
   lambdaName.mockReturnValue(ln)
   lambdaErrorAlarmName.mockReturnValue(len)
 
-  expect(toLambdaErrorAlarm(CID, TOPIC_ARN)).toEqual({
+  expect(toLambdaErrorAlarm(CONSUMER_ID, TOPIC_ARN)).toEqual({
     AlarmActions: [TOPIC_ARN],
     AlarmName: len,
     ComparisonOperator: "GreaterThanOrEqualToThreshold",
@@ -175,7 +175,7 @@ test("toLogErrorAlarm", () => {
   logErrorAlarmName.mockReturnValue(len)
   metricName.mockReturnValue(mn)
 
-  expect(toLogErrorAlarm(CID, TOPIC_ARN)).toEqual({
+  expect(toLogErrorAlarm(CONSUMER_ID, TOPIC_ARN)).toEqual({
     AlarmActions: [TOPIC_ARN],
     AlarmName: len,
     ComparisonOperator: "GreaterThanOrEqualToThreshold",
@@ -193,7 +193,7 @@ test("toLogErrorAlarm", () => {
 test("toCreateFunc", () => {
   const ln = "ln"
   const req = {
-    cId: CID,
+    cId: CONSUMER_ID,
     concurrency: { reserved: 2, post: 5 },
     location: { bucket: "b", key: "k", version: "1.0" },
     queues: {
@@ -235,7 +235,7 @@ test("toPutFuncConcurrency", () => {
   const con = 3
   lambdaName.mockReturnValue(ln)
 
-  expect(toPutFuncConcurrency(CID, con)).toEqual({
+  expect(toPutFuncConcurrency(CONSUMER_ID, con)).toEqual({
     FunctionName: ln,
     ReservedConcurrentExecutions: con,
   })
@@ -249,7 +249,7 @@ test("toCreateEventSourceMapping", () => {
   }
   lambdaName.mockReturnValue(ln)
 
-  expect(toCreateEventSourceMapping(CID, qs.partner.arn)).toEqual({
+  expect(toCreateEventSourceMapping(CONSUMER_ID, qs.partner.arn)).toEqual({
     BatchSize: BATCH,
     Enabled: true,
     EventSourceArn: qs.partner.arn,
@@ -261,7 +261,7 @@ test("toCreateRole", () => {
   const rn = "rn"
   roleName.mockReturnValue(rn)
 
-  expect(toCreateRole(CID)).toEqual({
+  expect(toCreateRole(CONSUMER_ID)).toEqual({
     AssumeRolePolicyDocument: JSON.stringify({
       Statement: [
         {
@@ -275,7 +275,7 @@ test("toCreateRole", () => {
     Path: "/",
     RoleName: rn,
     Tags: [
-      { Key: "ConsumerId", Value: CID.toString() },
+      { Key: "ConsumerId", Value: CONSUMER_ID.toString() },
       { Key: "Creator", Value: "webhook-provisioner" },
       { Key: "Environment", Value: ENV },
       { Key: "Project", Value: PROJECT },
@@ -295,7 +295,7 @@ test("toCreatePolicy", () => {
   }
   policyName.mockReturnValue(pn)
 
-  expect(toCreatePolicy(CID, lg, qs)).toEqual({
+  expect(toCreatePolicy(CONSUMER_ID, lg, qs)).toEqual({
     PolicyDocument: JSON.stringify({
       Statement: [
         {

@@ -9,19 +9,19 @@ import { IFunc, Location } from ".."
 import { latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
 
-const lam = new Lambda()
+const lambdaClient = new Lambda()
 const throttle = pThrottle({
   limit: 10,
   interval: 2500,
 })
-const re = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
+const webhookPattern = new RegExp(`^webhooks-\\d+-lambda-${ENV}$`)
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
 const FULFILLED = "fulfilled"
 const REJECTED = "rejected"
 
 export const updateAll = async (): Promise<IFunc[]> => {
-  const [lc, fns] = await Promise.all([latestCode(), allFuncs()])
+  const [lc, fns] = await Promise.all([latestCode(), allFunctions()])
   const [upd, notUpd] = partition(
     fns,
     (f) => toEpoch(f.vars.VERSION) < toEpoch(lc.version)
@@ -51,12 +51,12 @@ export const updateAll = async (): Promise<IFunc[]> => {
     .map((r) => (r as PromiseFulfilledResult<IFunc>).value)
 }
 
-const allFuncs = async (): Promise<Fn[]> => {
+const allFunctions = async (): Promise<Fn[]> => {
   let all: Fn[] = []
-  const allFuncsRec = async (nm?: string): Promise<Fn[]> => {
-    const res = await lam.listFunctions({ Marker: nm }).promise()
+  const allFunctionsRec = async (nm?: string): Promise<Fn[]> => {
+    const res = await lambdaClient.listFunctions({ Marker: nm }).promise()
     if (res.Functions) all = all.concat(toFns(res.Functions))
-    return res.NextMarker ? allFuncsRec(res.NextMarker) : all
+    return res.NextMarker ? allFunctionsRec(res.NextMarker) : all
   }
 
   const toFns = (fns: FunctionList) =>
@@ -64,7 +64,7 @@ const allFuncs = async (): Promise<Fn[]> => {
       .filter(
         (f) =>
           f.FunctionName &&
-          re.test(f.FunctionName) &&
+          webhookPattern.test(f.FunctionName) &&
           f.Environment &&
           f.Environment.Variables
       )
@@ -73,7 +73,7 @@ const allFuncs = async (): Promise<Fn[]> => {
         vars: (f.Environment as ER).Variables as EV,
       }))
 
-  return allFuncsRec()
+  return allFunctionsRec()
 }
 
 const toEpoch = (s: string): number => new Date(s).getTime()
@@ -87,7 +87,7 @@ function partition<T>(as: T[], pred: (a: T) => boolean) {
 
 const update = async (f: Fn, lc: Location): Promise<IFunc> =>
   await logRes(`Updating ${f.name}`, async () => {
-    await lam
+    await lambdaClient
       .updateFunctionCode({
         FunctionName: f.name,
         Publish: true,
@@ -96,9 +96,11 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
       })
       .promise()
     log(`updateFunctionCode complete for ${f.name}`)
-    await lam.waitFor("functionUpdatedV2", { FunctionName: f.name }).promise()
+    await lambdaClient
+      .waitFor("functionUpdatedV2", { FunctionName: f.name })
+      .promise()
     const arn = (
-      await lam
+      await lambdaClient
         .updateFunctionConfiguration({
           Environment: { Variables: { ...f.vars, VERSION: lc.version } },
           FunctionName: f.name,
