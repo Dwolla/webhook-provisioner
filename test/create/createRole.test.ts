@@ -17,18 +17,18 @@ iam.mockImplementationOnce(() => ({
 import { createRole as cr } from "../../src/create/createRole"
 
 test("createRole", async () => {
-  const cId = 123
-  const c = { x: 0 }
-  const cp = { x: 1 }
-  const lg = { arn: "arn" }
-  const qs = {
+  const consumerId = 123
+  const createRoleRequest = { x: 0 }
+  const createPolicyRequest = { x: 1 }
+  const logGroup = { arn: "arn" }
+  const queues = {
     error: { url: "eu", arn: "e" },
     partner: { url: "pu", arn: "p" },
     result: { url: "ru", arn: "r" },
   }
   const r = { roleName: "rn", roleArn: "ra", policyArn: "pa" }
-  toCreateRole.mockReturnValue(c)
-  toCreatePolicy.mockReturnValue(cp)
+  toCreateRole.mockReturnValue(createRoleRequest)
+  toCreatePolicy.mockReturnValue(createPolicyRequest)
   createRole.mockReturnValue({
     promise: () => ({ Role: { RoleName: r.roleName, Arn: r.roleArn } }),
   })
@@ -37,12 +37,12 @@ test("createRole", async () => {
   })
   attachRolePolicy.mockReturnValue({ promise: () => ({}) })
 
-  await expect(cr(cId, lg, qs)).resolves.toEqual(r)
+  await expect(cr(consumerId, logGroup, queues)).resolves.toEqual(r)
 
-  expect(toCreateRole).toHaveBeenCalledWith(cId)
-  expect(createRole).toHaveBeenCalledWith(c)
-  expect(toCreatePolicy).toHaveBeenCalledWith(cId, lg, qs)
-  expect(createPolicy).toHaveBeenCalledWith(cp)
+  expect(toCreateRole).toHaveBeenCalledWith(consumerId)
+  expect(createRole).toHaveBeenCalledWith(createRoleRequest)
+  expect(toCreatePolicy).toHaveBeenCalledWith(consumerId, logGroup, queues)
+  expect(createPolicy).toHaveBeenCalledWith(createPolicyRequest)
   expect(attachRolePolicy).toHaveBeenCalledWith({
     PolicyArn: r.policyArn,
     RoleName: r.roleName,

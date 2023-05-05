@@ -52,14 +52,14 @@ interface IAlarmProps {
 
 export const toCreateQueue = (
   cId: ConsumerId,
-  dlqArn: string,
+  deadLetterTarget: string,
   funcTimeout: number
 ): CreateQueueRequest => ({
   // Best practice min maxReceiveCount is 5 and VisibilityTimeout is 6x function timeout, https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html
   Attributes: {
     MessageRetentionPeriod: "1209600", // 14 days
     RedrivePolicy: JSON.stringify({
-      deadLetterTargetArn: dlqArn,
+      deadLetterTargetArn: deadLetterTarget,
       maxReceiveCount: 10,
     }),
     VisibilityTimeout: (funcTimeout * 6).toString(),

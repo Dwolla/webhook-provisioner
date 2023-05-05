@@ -18,12 +18,12 @@ lam.mockImplementationOnce(() => ({
 import { createLambda } from "../../src/create/createLambda"
 
 test("createLambda", async () => {
-  const arn = "arn"
-  const eId = "eId"
-  const esm = { x: 0 }
-  const cf = { x: 1 }
-  const pfc = { x: 2 }
-  const req = {
+  const resourceName = "arn"
+  const eventId = "eId"
+  const eventSourceMapping = { x: 0 }
+  const createFunctionResponse = { x: 1 }
+  const concurrencyRequest = { x: 2 }
+  const createRequest = {
     cId: 123,
     concurrency: { reserved: 2, post: 5 },
     location: { bucket: "b", key: "k", version: "1.0" },
@@ -36,25 +36,29 @@ test("createLambda", async () => {
     timeout: 10,
     maxRetries: 8,
   }
-  toCreateFunc.mockReturnValue(cf)
-  toPutFuncConcurrency.mockReturnValue(pfc)
-  toCreateEventSourceMapping.mockReturnValue(esm)
-  createFunction.mockReturnValue({ promise: () => ({ FunctionArn: arn }) })
+  toCreateFunc.mockReturnValue(createFunctionResponse)
+  toPutFuncConcurrency.mockReturnValue(concurrencyRequest)
+  toCreateEventSourceMapping.mockReturnValue(eventSourceMapping)
+  createFunction.mockReturnValue({
+    promise: () => ({ FunctionArn: resourceName }),
+  })
   putFunctionConcurrency.mockReturnValue({ promise: () => ({}) })
-  createEventSourceMapping.mockReturnValue({ promise: () => ({ UUID: eId }) })
-
-  await expect(createLambda(req)).resolves.toEqual({
-    arn,
-    eventSourceId: eId,
+  createEventSourceMapping.mockReturnValue({
+    promise: () => ({ UUID: eventId }),
   })
 
-  expect(toCreateFunc).toHaveBeenCalledWith(req)
-  expect(createFunction).toHaveBeenCalledWith(cf)
-  expect(toPutFuncConcurrency).toHaveBeenCalledWith(req.cId, 2)
-  expect(putFunctionConcurrency).toHaveBeenCalledWith(pfc)
+  await expect(createLambda(createRequest)).resolves.toEqual({
+    arn: resourceName,
+    eventSourceId: eventId,
+  })
+
+  expect(toCreateFunc).toHaveBeenCalledWith(createRequest)
+  expect(createFunction).toHaveBeenCalledWith(createFunctionResponse)
+  expect(toPutFuncConcurrency).toHaveBeenCalledWith(createRequest.cId, 2)
+  expect(putFunctionConcurrency).toHaveBeenCalledWith(concurrencyRequest)
   expect(toCreateEventSourceMapping).toHaveBeenCalledWith(
-    req.cId,
-    req.queues.partner.arn
+    createRequest.cId,
+    createRequest.queues.partner.arn
   )
-  expect(createEventSourceMapping).toHaveBeenCalledWith(esm)
+  expect(createEventSourceMapping).toHaveBeenCalledWith(eventSourceMapping)
 })

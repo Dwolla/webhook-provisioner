@@ -18,32 +18,38 @@ const latestCode = lc.latestCode as jest.Mock
 import { updateAll } from "../../src/updateCode/update"
 
 test("update", async () => {
-  const arn = "a"
-  const con = "5"
+  const resourceName = "a"
+  const concurrency = "5"
   const ver = 1
-  const c = { bucket: "b", key: "k", version: (ver + 1).toString() }
-  const valid = (n: number) => `webhooks-${n}-lambda-test`
+  const configurationRequest = {
+    bucket: "b",
+    key: "k",
+    version: (ver + 1).toString(),
+  }
+  const validLambdaName = (n: number) => `webhooks-${n}-lambda-test`
   let i = 0
   const noName = { Environment: { Variables: { VERSION: ver.toString() } } }
   const wrongName = {
     Environment: { Variables: { VERSION: ver.toString() } },
-    FunctionName: "f",
+    FunctionName: "function-name",
   }
-  const noEnv = { FunctionName: valid(i++) }
-  const noVars = { FunctionName: valid(i++), Environment: {} }
-  const noVer = { FunctionName: valid(i++), Environment: {} }
+  const noEnv = { FunctionName: validLambdaName(i++) }
+  const noVars = { FunctionName: validLambdaName(i++), Environment: {} }
+  const noVer = { FunctionName: validLambdaName(i++), Environment: {} }
   const sameVer = {
     Environment: { Variables: { VERSION: (ver + 1).toString() } },
-    FunctionName: valid(i++),
+    FunctionName: validLambdaName(i++),
   }
   const newerVer = {
     Environment: { Variables: { VERSION: (ver + 2).toString() } },
-    FunctionName: valid(i++),
+    FunctionName: validLambdaName(i++),
   }
-  const fn = valid(i)
+  const functionName = validLambdaName(i)
   const olderVer = {
-    Environment: { Variables: { VERSION: ver.toString(), CONCURRENCY: con } },
-    FunctionName: fn,
+    Environment: {
+      Variables: { VERSION: ver.toString(), CONCURRENCY: concurrency },
+    },
+    FunctionName: functionName,
   }
   listFunctions.mockReturnValueOnce({
     promise: () => ({
@@ -61,32 +67,37 @@ test("update", async () => {
     }),
   })
   listFunctions.mockReturnValueOnce({ promise: () => ({ Functions: [] }) })
-  latestCode.mockResolvedValue(c)
+  latestCode.mockResolvedValue(configurationRequest)
   updateFunctionCode.mockReturnValue({ promise: () => ({}) })
   waitFor.mockReturnValue({ promise: () => ({}) })
   updateFunctionConfiguration.mockReturnValue({
-    promise: () => ({ FunctionArn: arn }),
+    promise: () => ({ FunctionArn: resourceName }),
   })
 
-  await expect(updateAll()).resolves.toEqual([{ arn }])
+  await expect(updateAll()).resolves.toEqual([{ arn: resourceName }])
 
   expect(latestCode).toHaveBeenCalledTimes(1)
   expect(listFunctions).toHaveBeenCalledTimes(2)
   expect(listFunctions).toHaveBeenCalledWith({})
   expect(listFunctions).toHaveBeenCalledWith({ Marker: 1 })
   expect(updateFunctionCode).toHaveBeenCalledWith({
-    FunctionName: fn,
+    FunctionName: functionName,
     Publish: true,
-    S3Bucket: c.bucket,
-    S3Key: c.key,
+    S3Bucket: configurationRequest.bucket,
+    S3Key: configurationRequest.key,
   })
   expect(waitFor).toHaveBeenCalledTimes(1)
   expect(waitFor).toHaveBeenCalledWith("functionUpdatedV2", {
-    FunctionName: fn,
+    FunctionName: functionName,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
-    Environment: { Variables: { CONCURRENCY: con, VERSION: c.version } },
-    FunctionName: fn,
+    Environment: {
+      Variables: {
+        CONCURRENCY: concurrency,
+        VERSION: configurationRequest.version,
+      },
+    },
+    FunctionName: functionName,
     MemorySize: 128,
     Runtime: "nodejs16.x",
     Timeout: 32,

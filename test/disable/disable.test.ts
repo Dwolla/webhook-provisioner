@@ -21,14 +21,14 @@ const queueName = mapper.queueName as jest.Mock
 import { disable } from "../../src/disable/disable"
 
 describe("disable", () => {
-  const evt = { consumerId: 123, purgeQueue: true }
-  const ln = "ln"
-  const qn = "qn"
-  const url = "url"
+  const disableEvent = { consumerId: 123, purgeQueue: true }
+  const lambda = "ln"
+  const queue = "qn"
+  const queueUrl = "url"
   const id = "id"
-  lambdaName.mockReturnValue(ln)
-  queueName.mockReturnValue(qn)
-  getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: url }) })
+  lambdaName.mockReturnValue(lambda)
+  queueName.mockReturnValue(queue)
+  getQueueUrl.mockReturnValue({ promise: () => ({ QueueUrl: queueUrl }) })
   listEventSourceMappings.mockReturnValue({
     promise: () => ({ EventSourceMappings: [{ UUID: id }] }),
   })
@@ -37,11 +37,13 @@ describe("disable", () => {
   it("disables and purges", async () => {
     purgeQueue.mockReturnValue({ promise: () => ({}) })
 
-    await expect(disable(evt)).resolves.toBe(undefined)
+    await expect(disable(disableEvent)).resolves.toBe(undefined)
 
-    expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
-    expect(purgeQueue).toHaveBeenCalledWith({ QueueUrl: url })
-    expect(listEventSourceMappings).toHaveBeenCalledWith({ FunctionName: ln })
+    expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: queue })
+    expect(purgeQueue).toHaveBeenCalledWith({ QueueUrl: queueUrl })
+    expect(listEventSourceMappings).toHaveBeenCalledWith({
+      FunctionName: lambda,
+    })
     expect(updateEventSourceMapping).toHaveBeenCalledWith({
       Enabled: false,
       UUID: id,
@@ -60,10 +62,10 @@ describe("disable", () => {
     })
     updateEventSourceMapping.mockReturnValue({ promise: () => ({}) })
 
-    await expect(disable(evt)).resolves.toBe(undefined)
+    await expect(disable(disableEvent)).resolves.toBe(undefined)
 
-    expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: qn })
-    expect(purgeQueue).toHaveBeenCalledWith({ QueueUrl: url })
+    expect(getQueueUrl).toHaveBeenCalledWith({ QueueName: queue })
+    expect(purgeQueue).toHaveBeenCalledWith({ QueueUrl: queueUrl })
   })
 })
 

@@ -20,47 +20,47 @@ sqs.mockImplementationOnce(() => ({
 import { createQueue as cq } from "../../src/create/createQueue"
 
 test("createQueue", async () => {
-  const cId = 123
-  const to = 32
-  const p = { url: "pu", arn: "p" }
-  const r = { url: "ru", arn: "r" }
-  const e = { url: "eu", arn: "e" }
-  const cr = { x: 0 }
-  const tq = { x: 1 }
-  const ga = { x: 2 }
-  toCreateQueue.mockReturnValue(cr)
-  toGetQueueAttributes.mockReturnValue(ga)
-  toTagQueue.mockReturnValue(tq)
-  createQueue.mockReturnValue({ promise: () => ({ QueueUrl: p.url }) })
+  const consumerId = 123
+  const timeout = 32
+  const partner = { url: "pu", arn: "p" }
+  const result = { url: "ru", arn: "r" }
+  const error = { url: "eu", arn: "e" }
+  const createQueueRequest = { x: 0 }
+  const tagQueueRequest = { x: 1 }
+  const getQueueAttributesRequest = { x: 2 }
+  toCreateQueue.mockReturnValue(createQueueRequest)
+  toGetQueueAttributes.mockReturnValue(getQueueAttributesRequest)
+  toTagQueue.mockReturnValue(tagQueueRequest)
+  createQueue.mockReturnValue({ promise: () => ({ QueueUrl: partner.url }) })
   tagQueue.mockReturnValue({ promise: () => ({}) })
   getQueueUrl.mockReturnValueOnce({
-    promise: () => ({ QueueUrl: r.url }),
+    promise: () => ({ QueueUrl: result.url }),
   })
   getQueueUrl.mockReturnValueOnce({
-    promise: () => ({ QueueUrl: e.url }),
+    promise: () => ({ QueueUrl: error.url }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: r.arn } }),
+    promise: () => ({ Attributes: { QueueArn: result.arn } }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: e.arn } }),
+    promise: () => ({ Attributes: { QueueArn: error.arn } }),
   })
   getQueueAttributes.mockReturnValueOnce({
-    promise: () => ({ Attributes: { QueueArn: p.arn } }),
+    promise: () => ({ Attributes: { QueueArn: partner.arn } }),
   })
 
-  await expect(cq(cId, to)).resolves.toEqual({
-    error: e,
-    partner: p,
-    result: r,
+  await expect(cq(consumerId, timeout)).resolves.toEqual({
+    error: error,
+    partner: partner,
+    result: result,
   })
 
-  expect(toCreateQueue).toHaveBeenCalledWith(cId, e.arn, to)
-  expect(createQueue).toHaveBeenCalledWith(cr)
-  expect(toTagQueue).toHaveBeenCalledWith(cId, p.url)
-  expect(tagQueue).toHaveBeenCalledWith(tq)
-  expect(toGetQueueAttributes).toHaveBeenCalledWith(p.url)
-  expect(toGetQueueAttributes).toHaveBeenCalledWith(r.url)
-  expect(toGetQueueAttributes).toHaveBeenCalledWith(e.url)
+  expect(toCreateQueue).toHaveBeenCalledWith(consumerId, error.arn, timeout)
+  expect(createQueue).toHaveBeenCalledWith(createQueueRequest)
+  expect(toTagQueue).toHaveBeenCalledWith(consumerId, partner.url)
+  expect(tagQueue).toHaveBeenCalledWith(tagQueueRequest)
+  expect(toGetQueueAttributes).toHaveBeenCalledWith(partner.url)
+  expect(toGetQueueAttributes).toHaveBeenCalledWith(result.url)
+  expect(toGetQueueAttributes).toHaveBeenCalledWith(error.url)
   expect(getQueueAttributes).toHaveBeenCalledTimes(3)
 })
