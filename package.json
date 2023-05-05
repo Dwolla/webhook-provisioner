@@ -29,7 +29,7 @@
     "@aws-cdk/aws-sqs": "^1.4.0",
     "@aws-cdk/core": "^1.4.0",
     "@types/async-retry": "^1.4.1",
-    "aws-cdk": "^1.4.0",
+    "aws-cdk": "^1.179.0",
     "aws-sdk": "^2.1243.0",
     "husky": "^3.0.4",
     "serverless-iam-roles-per-function": "3.0.0-d84bffd",
