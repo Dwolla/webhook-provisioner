@@ -15,8 +15,7 @@ import {
   Tag,
   CfnResource,
 } from "@aws-cdk/core"
-import { envVar, error } from "@therockstorm/utils"
-import SNS from "aws-sdk/clients/sns"
+import { envVar } from "@therockstorm/utils"
 import { name } from "../package.json"
 
 type AlarmProps = Readonly<{
@@ -175,18 +174,12 @@ class MyStack extends Stack {
 }
 
 const create = async () => {
-  let arn = ""
-  try {
-    arn = (
-      await new SNS({ region: REGION })
-        .createTopic({ Name: `cloudwatch-alarm-to-slack-topic-${ENV}` })
-        .promise()
-    ).TopicArn as string
-  } catch (e) {
-    error({ code: e.code, message: e.message })
-  }
   const app = new App()
-  const stack = new MyStack(app, "Stack", arn)
+  const stack = new MyStack(
+    app,
+    "Stack",
+    `arn:aws:sns:us-west-2:455620323323:cloudwatch-alarm-to-slack-topic-${ENV}`
+  )
   stack.node.applyAspect(new Tag("Environment", ENV))
   stack.node.applyAspect(new Tag("Project", PROJECT))
   stack.node.applyAspect(new Tag("Creator", "serverless"))
