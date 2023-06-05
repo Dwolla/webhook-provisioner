@@ -3,7 +3,7 @@ import * as mapper from "../../src/create/mapper"
 
 jest.mock("aws-sdk/clients/cloudwatchlogs")
 jest.mock("../../src/create/mapper")
-const cwl = (CloudWatchLogs as unknown) as jest.Mock
+const cwl = CloudWatchLogs as unknown as jest.Mock
 const toCreateLogGroup = mapper.toCreateLogGroup as jest.Mock
 const toDescribeLogGroups = mapper.toDescribeLogGroups as jest.Mock
 const toPutMetricFilter = mapper.toPutMetricFilter as jest.Mock

@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/skripts/.eslintrc",
+  "extends": "./.eslint.js",
   "rules": {
     "@typescript-eslint/ban-types": ["off"]
   }

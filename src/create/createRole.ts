@@ -1,8 +1,8 @@
-import { log } from "@therockstorm/utils"
 import IAM from "aws-sdk/clients/iam"
 import { ConsumerId, LogGroup, Queues, Role } from ".."
 import { logRes } from "../util"
 import { toCreatePolicy, toCreateRole } from "./mapper"
+import { log } from "../logger"
 
 const iam = new IAM()
 

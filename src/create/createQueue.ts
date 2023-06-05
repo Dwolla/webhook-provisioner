@@ -1,9 +1,9 @@
-import { log } from "@therockstorm/utils"
 import SQS from "aws-sdk/clients/sqs"
 import { ConsumerId, Queues } from ".."
 import { errorQueueName, resultQueueName } from "../mapper"
 import { logRes } from "../util"
 import { toCreateQueue, toGetQueueAttributes, toTagQueue } from "./mapper"
+import { log } from "../logger"
 
 const sqs = new SQS()
 

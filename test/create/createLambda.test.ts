@@ -3,8 +3,9 @@ import * as mapper from "../../src/create/mapper"
 
 jest.mock("aws-sdk/clients/lambda")
 jest.mock("../../src/create/mapper")
-const lam = (Lambda as unknown) as jest.Mock
-const toCreateEventSourceMapping = mapper.toCreateEventSourceMapping as jest.Mock
+const lam = Lambda as unknown as jest.Mock
+const toCreateEventSourceMapping =
+  mapper.toCreateEventSourceMapping as jest.Mock
 const toCreateFunc = mapper.toCreateFunc as jest.Mock
 const toPutFuncConcurrency = mapper.toPutFuncConcurrency as jest.Mock
 const createFunction = jest.fn()

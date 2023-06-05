@@ -1,33 +1,40 @@
-const { serverless } = require("skripts/config")
-
 const project = "webhooks"
 
 module.exports = {
-  ...serverless,
+  service: "${file(./package.json):name}",
+  vpc:
+    process.env.SKRIPTS_VPC_SECURITY_GROUPS && process.env.SKRIPTS_VPC_SUBNETS
+      ? {
+          securityGroupIds: process.env.SKRIPTS_VPC_SECURITY_GROUPS.split(","),
+          subnetIds: process.env.SKRIPTS_VPC_SUBNETS.split(","),
+        }
+      : null,
+  frameworkVersion: "3",
+  cfnRole: process.env.SKRIPTS_CFN_ROLE || null,
   custom: {
-    ...serverless.custom,
     bucket: "${env:SKRIPTS_DEPLOYMENT_BUCKET, 'default'}",
     bucketArn: "arn:aws:s3:::${self:custom.bucket}",
     eventSourceArn:
-      "arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:event-source-mapping:*",
+      "arn:aws:lambda:${self:provider.region}:${aws:accountId}:event-source-mapping:*",
     keyArn:
       "arn:aws:s3:::${self:custom.bucket}/serverless/webhook-handler/${self:provider.stage}/*",
     lambdaArn:
-      "arn:aws:lambda:${self:provider.region}:#{AWS::AccountId}:function:${self:custom.project}-*-lambda-${self:provider.stage}",
+      "arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:custom.project}-*-lambda-${self:provider.stage}",
     logGroupArn:
-      "arn:aws:logs:${self:provider.region}:#{AWS::AccountId}:log-group:*",
+      "arn:aws:logs:${self:provider.region}:${aws:accountId}:log-group:*",
     logStreamArn:
-      "arn:aws:logs:${self:provider.region}:#{AWS::AccountId}:log-group:/aws/lambda/${self:custom.project}-*-lambda-${self:provider.stage}:*",
+      "arn:aws:logs:${self:provider.region}:${aws:accountId}:log-group:/aws/lambda/${self:custom.project}-*-lambda-${self:provider.stage}:*",
     policyArn:
-      "arn:aws:iam::#{AWS::AccountId}:policy/${self:custom.project}-*-policy-${self:provider.region}-${self:provider.stage}",
+      "arn:aws:iam::${aws:accountId}:policy/${self:custom.project}-*-policy-${self:provider.region}-${self:provider.stage}",
     project,
     queueArn:
-      "arn:aws:sqs:${self:provider.region}:#{AWS::AccountId}:${self:custom.project}-*-consumer-queue-${self:provider.stage}",
+      "arn:aws:sqs:${self:provider.region}:${aws:accountId}:${self:custom.project}-*-consumer-queue-${self:provider.stage}",
     retriesMax: "${env:RETRIES_MAX, '8'}",
     roleArn:
-      "arn:aws:iam::#{AWS::AccountId}:role/${self:custom.project}-*-role-${self:provider.region}-${self:provider.stage}",
+      "arn:aws:iam::${aws:accountId}:role/${self:custom.project}-*-role-${self:provider.region}-${self:provider.stage}",
     tags: {
-      ...serverless.custom.tags,
+      Creator: "serverless",
+      Environment: "${self:provider.stage}",
       Project: project,
       Team: "growth",
       Visibility: "external",
@@ -36,7 +43,7 @@ module.exports = {
       "org.label-schema.vcs-ref": "${env:GIT_COMMIT, 'n/a'}",
     },
     topicArn:
-      "arn:aws:sns:${self:provider.region}:#{AWS::AccountId}:cloudwatch-alarm-to-slack-topic-${self:provider.stage}",
+      "arn:aws:sns:${self:provider.region}:${aws:accountId}:cloudwatch-alarm-to-slack-topic-${self:provider.stage}",
   },
   functions: {
     create: {
@@ -260,22 +267,32 @@ module.exports = {
       timeout: 120,
     },
   },
-  package: { individually: "${file(./config.js):packageIndividually}" },
-  plugins: [
-    ...serverless.plugins,
-    "serverless-iam-roles-per-function",
-    "serverless-pseudo-parameters",
-  ],
+  package: {
+    individually: '${file(./config.js):packageIndividually(), "false"}',
+  },
+  plugins: ["serverless-iam-roles-per-function", "serverless-webpack"],
   provider: {
-    ...serverless.provider,
+    deploymentBucket: process.env.SKRIPTS_DEPLOYMENT_BUCKET
+      ? {
+          name: process.env.SKRIPTS_DEPLOYMENT_BUCKET,
+          serverSideEncryption: "AES256",
+        }
+      : null,
     environment: {
-      ...serverless.provider.environment,
+      AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1,
       DEPLOYMENT_BUCKET: "${self:custom.bucket}",
-      ENVIRONMENT: "${self:provider.stage}",
+      ENVIRONMENT: "${opt:stage, env:ENVIRONMENT}",
       RETRIES_MAX: "${self:custom.retriesMax}",
     },
+    logRetentionInDays: 365,
+    memorySize: 128,
+    name: "aws",
+    region: "us-west-2",
+    stackTags: "${self:custom.tags}",
+    stage: "${opt:stage, env:ENVIRONMENT}",
+    tags: "${self:custom.tags}",
     timeout: 30,
-    runtime: "nodejs16.x",
+    runtime: "nodejs18.x",
   },
   resources: "${file(./scripts/stack.yml)}",
 }

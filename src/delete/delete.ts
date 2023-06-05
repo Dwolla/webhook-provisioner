@@ -1,4 +1,3 @@
-import { log } from "@therockstorm/utils"
 import CloudWatch from "aws-sdk/clients/cloudwatch"
 import CloudWatchLogs from "aws-sdk/clients/cloudwatchlogs"
 import IAM from "aws-sdk/clients/iam"
@@ -17,6 +16,7 @@ import {
   roleName,
 } from "../mapper"
 import { ignore404 } from "../util"
+import { log } from "../logger"
 
 const cw = new CloudWatch()
 const cwl = new CloudWatchLogs()

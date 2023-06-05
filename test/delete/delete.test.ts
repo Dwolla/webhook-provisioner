@@ -11,11 +11,11 @@ jest.mock("aws-sdk/clients/iam")
 jest.mock("aws-sdk/clients/lambda")
 jest.mock("aws-sdk/clients/sqs")
 jest.mock("../../src/mapper")
-const cw = (CloudWatch as unknown) as jest.Mock
-const cwl = (CloudWatchLogs as unknown) as jest.Mock
-const iam = (IAM as unknown) as jest.Mock
-const lam = (Lambda as unknown) as jest.Mock
-const sqs = (SQS as unknown) as jest.Mock
+const cw = CloudWatch as unknown as jest.Mock
+const cwl = CloudWatchLogs as unknown as jest.Mock
+const iam = IAM as unknown as jest.Mock
+const lam = Lambda as unknown as jest.Mock
+const sqs = SQS as unknown as jest.Mock
 const deleteAlarms = jest.fn()
 const deleteLogGroup = jest.fn()
 const deleteMetricFilter = jest.fn()
