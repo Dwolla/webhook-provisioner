@@ -1,7 +1,7 @@
 import S3 from "aws-sdk/clients/s3"
 
 jest.mock("aws-sdk/clients/s3")
-const s3 = (S3 as unknown) as jest.Mock
+const s3 = S3 as unknown as jest.Mock
 const listObjectsV2 = jest.fn()
 s3.mockImplementationOnce(() => ({ listObjectsV2 }))
 import { latestCode } from "../src/latestCode"

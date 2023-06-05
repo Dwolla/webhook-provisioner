@@ -10,8 +10,8 @@ const updateFunctionConfiguration = jest.fn()
 const getFunctionConfiguration = jest.fn()
 const getQueueUrl = jest.fn()
 const setQueueAttributes = jest.fn()
-const lam = (Lambda as unknown) as jest.Mock
-const sqs = (SQS as unknown) as jest.Mock
+const lam = Lambda as unknown as jest.Mock
+const sqs = SQS as unknown as jest.Mock
 lam.mockImplementationOnce(() => ({
   getFunctionConfiguration,
   putFunctionConcurrency,
@@ -56,7 +56,9 @@ test("update", async () => {
     Attributes: { VisibilityTimeout: "192" },
     QueueUrl: qUrl,
   })
-  expect(getFunctionConfiguration).toHaveBeenCalledWith({ FunctionName: lName })
+  expect(getFunctionConfiguration).toHaveBeenCalledWith({
+    FunctionName: lName,
+  })
   expect(putFunctionConcurrency).toHaveBeenCalledWith({
     FunctionName: lName,
     ReservedConcurrentExecutions: 2,

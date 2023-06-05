@@ -7,7 +7,7 @@ const updateFunctionCode = jest.fn()
 const updateFunctionConfiguration = jest.fn()
 const listFunctions = jest.fn()
 const waitFor = jest.fn()
-const lam = (Lambda as unknown) as jest.Mock
+const lam = Lambda as unknown as jest.Mock
 lam.mockImplementationOnce(() => ({
   listFunctions,
   updateFunctionCode,

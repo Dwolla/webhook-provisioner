@@ -1,18 +1,26 @@
-import { envVar, error, log, thrw, warn } from "@therockstorm/utils"
 import asyncRetry from "async-retry"
 import { AWSError } from "aws-sdk"
 import { IConcurrency, Res } from "."
 import { toRes } from "./mapper"
+import { error, log, warn } from "./logger"
+
+export const envVarRequired = (name: string): string => {
+  const envVar = process.env[name]
+  if (envVar) {
+    return envVar
+  }
+  throw new Error(`${name} required`)
+}
 
 export const BATCH = 10
-export const DEPLOYMENT_BUCKET = envVar("DEPLOYMENT_BUCKET")
-export const ENV = envVar("ENVIRONMENT")
+export const DEPLOYMENT_BUCKET = envVarRequired("DEPLOYMENT_BUCKET")
+export const ENV = envVarRequired("ENVIRONMENT")
 export const PROJECT = "webhooks"
 export const REGION = process.env.AWS_REGION || "us-west-2"
 const HTTP_TIMEOUT = 10
 const QUEUE_SEND_TIMEOUT = 5
 const MISC_TIMEOUT = 2
-const RETRIES_MAX = envVar("RETRIES_MAX")
+const RETRIES_MAX = envVarRequired("RETRIES_MAX")
 
 export const validateConcurrency = (con: IConcurrency) => {
   con.reserved = validate(con.reserved, 1, 10, 2)
@@ -41,9 +49,12 @@ export async function ignore404<T>(
 
   try {
     return await fn()
-  } catch (e) {
-    is404(e.code) ? warn(e.message) : thrw(e)
-    return
+  } catch (e: any) {
+    if (is404(e.code)) {
+      warn(e.message)
+      return
+    }
+    throw e
   }
 }
 
@@ -59,7 +70,7 @@ export async function retry<T>(fn: () => Promise<T>): Promise<T> {
     async (_, attempt) => {
       try {
         return await fn()
-      } catch (err) {
+      } catch (err: any) {
         warn(msg(err, { attempt }))
         throw err // Will retry
       }
@@ -74,7 +85,7 @@ export const withErrHandling = async (
 ): Promise<Res> => {
   try {
     return toRes(await bodyFunc())
-  } catch (err) {
+  } catch (err: any) {
     const c = err.code ? `${err.code}: ` : ""
     c.includes("QueueDeletedRecently") ? warn(msg(err)) : error(err)
     return toRes({ error: `${c}${err.message || "Unexpected error."}` }, 500)

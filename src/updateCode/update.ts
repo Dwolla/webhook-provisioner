@@ -1,4 +1,3 @@
-import { log } from "@therockstorm/utils"
 import Lambda, {
   EnvironmentResponse as ER,
   EnvironmentVariables as EV,
@@ -8,6 +7,7 @@ import pThrottle from "p-throttle"
 import { IFunc, Location } from ".."
 import { latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
+import { log } from "../logger"
 
 const lambdaClient = new Lambda()
 const throttle = pThrottle({

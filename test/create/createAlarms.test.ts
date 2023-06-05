@@ -5,8 +5,8 @@ import * as mapper from "../../src/create/mapper"
 jest.mock("aws-sdk/clients/cloudwatch")
 jest.mock("aws-sdk/clients/sns")
 jest.mock("../../src/create/mapper")
-const cw = (CloudWatch as unknown) as jest.Mock
-const sns = (SNS as unknown) as jest.Mock
+const cw = CloudWatch as unknown as jest.Mock
+const sns = SNS as unknown as jest.Mock
 const toLambdaErrorAlarm = mapper.toLambdaErrorAlarm as jest.Mock
 const toLogErrorAlarm = mapper.toLogErrorAlarm as jest.Mock
 const putMetricAlarm = jest.fn()
@@ -22,7 +22,9 @@ test("createAlarms", async () => {
   const logAlarmMetric = { x: 1 }
   toLambdaErrorAlarm.mockReturnValue(lambdaAlarmMetric)
   toLogErrorAlarm.mockReturnValue(logAlarmMetric)
-  createTopic.mockReturnValue({ promise: () => ({ TopicArn: alarmTopicName }) })
+  createTopic.mockReturnValue({
+    promise: () => ({ TopicArn: alarmTopicName }),
+  })
   putMetricAlarm.mockReturnValue({ promise: () => ({}) })
 
   await expect(cas(consumerId)).resolves.toEqual(undefined)

@@ -5,10 +5,10 @@ jest.mock("../src/mapper")
 const lambdaName = mapper.lambdaName as jest.Mock
 const listEventSourceMappings = jest.fn()
 const updateEventSourceMapping = jest.fn()
-const lam = ({
+const lam = {
   listEventSourceMappings,
   updateEventSourceMapping,
-} as unknown) as Lambda
+} as unknown as Lambda
 import { update } from "../src/eventSources"
 
 describe("update", () => {

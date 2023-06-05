@@ -3,7 +3,7 @@ import * as mapper from "../../src/create/mapper"
 
 jest.mock("aws-sdk/clients/iam")
 jest.mock("../../src/create/mapper")
-const iam = (IAM as unknown) as jest.Mock
+const iam = IAM as unknown as jest.Mock
 const toCreateRole = mapper.toCreateRole as jest.Mock
 const toCreatePolicy = mapper.toCreatePolicy as jest.Mock
 const createRole = jest.fn()

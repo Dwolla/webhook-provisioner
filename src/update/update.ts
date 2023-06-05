@@ -1,8 +1,8 @@
-import { log } from "@therockstorm/utils"
 import Lambda, { EnvironmentVariables } from "aws-sdk/clients/lambda"
 import SQS from "aws-sdk/clients/sqs"
 import pLimit from "p-limit"
 import { ConsumerId, IConcurrency, IFunc, IUpdateEvent } from ".."
+import { log } from "../logger"
 import { lambdaName, queueName } from "../mapper"
 import { calculateFuncTimeout, logRes, validateConcurrency } from "../util"
 

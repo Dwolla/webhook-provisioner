@@ -7,8 +7,8 @@ jest.mock("aws-sdk/clients/lambda")
 jest.mock("aws-sdk/clients/sqs")
 jest.mock("../../src/eventSources")
 jest.mock("../../src/mapper")
-const lam = (Lambda as unknown) as jest.Mock
-const sqs = (SQS as unknown) as jest.Mock
+const lam = Lambda as unknown as jest.Mock
+const sqs = SQS as unknown as jest.Mock
 const update = eventSources.update as jest.Mock
 const queueName = mapper.queueName as jest.Mock
 const getQueueUrl = jest.fn()

@@ -3,7 +3,7 @@ import * as mapper from "../../src/create/mapper"
 
 jest.mock("aws-sdk/clients/sqs")
 jest.mock("../../src/create/mapper")
-const sqs = (SQS as unknown) as jest.Mock
+const sqs = SQS as unknown as jest.Mock
 const toCreateQueue = mapper.toCreateQueue as jest.Mock
 const toGetQueueAttributes = mapper.toGetQueueAttributes as jest.Mock
 const toTagQueue = mapper.toTagQueue as jest.Mock

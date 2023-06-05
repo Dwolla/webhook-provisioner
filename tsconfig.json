@@ -1,4 +1,4 @@
 {
-  "extends": "./node_modules/skripts/base-tsconfig.json",
+  "extends": "./scripts/tsconfig.json",
   "include": ["server.ts", "src"]
 }

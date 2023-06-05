@@ -1,4 +1,3 @@
-import { error, log } from "@therockstorm/utils"
 import { createServer, IncomingMessage, ServerResponse } from "http"
 import { IConcurrencyEvent, IDisableEvent, IEvent, IUpdateEvent } from "./src"
 import { handle as cHandler } from "./src/create/handler"
@@ -6,6 +5,7 @@ import { handle as delHandler } from "./src/delete/handler"
 import { handle as dHandler } from "./src/disable/handler"
 import { handle as uHandler } from "./src/update/handler"
 import { handle as uCodeHandler } from "./src/updateCode/handler"
+import { log, error } from "./src/logger"
 
 const PORT = 8009
 const FUNCS = [
@@ -70,7 +70,7 @@ const handleReq = async (
         : { statusCode: 400, body: "Path not found." },
       res
     )
-  } catch (e) {
+  } catch (e: any) {
     error("handle err", e)
     return writeRes({ statusCode: 500, body: e.message }, res)
   }
