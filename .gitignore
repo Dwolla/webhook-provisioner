@@ -2,6 +2,8 @@
 event.json
 scripts/*.js
 stack.yml
+src/**.js
+src/**/**.js
 
 .idea/
 .serverless/
