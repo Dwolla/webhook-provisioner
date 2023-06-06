@@ -1,4 +1,5 @@
-import { envVar, error, log, thrw, warn } from "@therockstorm/utils"
+import { envVar, thrw } from "@therockstorm/utils"
+import { log, error, warn } from "./logger"
 import asyncRetry from "async-retry"
 import { AWSError } from "aws-sdk"
 import { IConcurrency, Res } from "."

@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "../logger"
 import Lambda from "aws-sdk/clients/lambda"
 import { CreateFuncReq, IFunc } from ".."
 import { logRes, retry } from "../util"

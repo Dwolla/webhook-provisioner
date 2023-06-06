@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "../logger"
 import SQS from "aws-sdk/clients/sqs"
 import { ConsumerId, Queues } from ".."
 import { errorQueueName, resultQueueName } from "../mapper"

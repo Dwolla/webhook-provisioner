@@ -1,4 +1,4 @@
-import { error, log } from "@therockstorm/utils"
+import { error, log } from "./src/logger"
 import { createServer, IncomingMessage, ServerResponse } from "http"
 import { IConcurrencyEvent, IDisableEvent, IEvent, IUpdateEvent } from "./src"
 import { handle as cHandler } from "./src/create/handler"

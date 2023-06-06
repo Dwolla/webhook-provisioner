@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "./logger"
 import Lambda, { EventSourceMappingConfiguration } from "aws-sdk/clients/lambda"
 import { ConsumerId } from "."
 import { lambdaName } from "./mapper"

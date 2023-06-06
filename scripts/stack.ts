@@ -15,7 +15,8 @@ import {
   Tag,
   CfnResource,
 } from "@aws-cdk/core"
-import { envVar, error } from "@therockstorm/utils"
+import { envVar } from "@therockstorm/utils"
+import { error } from "../src/logger"
 import SNS from "aws-sdk/clients/sns"
 import { name } from "../package.json"
 

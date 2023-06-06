@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "../logger"
 import IAM from "aws-sdk/clients/iam"
 import { ConsumerId, LogGroup, Queues, Role } from ".."
 import { logRes } from "../util"

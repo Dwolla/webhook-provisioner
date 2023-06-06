@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "../logger"
 import Lambda, {
   EnvironmentResponse as ER,
   EnvironmentVariables as EV,

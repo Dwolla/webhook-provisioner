@@ -1,4 +1,5 @@
-import { log, thrw, warn } from "@therockstorm/utils"
+import { log, warn } from "../logger"
+import { thrw } from "@therockstorm/utils"
 import Lambda from "aws-sdk/clients/lambda"
 import SQS, { GetQueueUrlResult } from "aws-sdk/clients/sqs"
 import { ConsumerId, IDisableEvent } from ".."

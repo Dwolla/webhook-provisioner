@@ -1,4 +1,4 @@
-import { log } from "@therockstorm/utils"
+import { log } from "../logger"
 import "source-map-support/register"
 import { IConcurrencyEvent, Res } from ".."
 import { withErrHandling } from "../util"
