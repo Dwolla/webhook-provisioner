@@ -1,4 +1,3 @@
-import { log } from "@therockstorm/utils"
 import CloudWatch from "aws-sdk/clients/cloudwatch"
 import CloudWatchLogs from "aws-sdk/clients/cloudwatchlogs"
 import IAM from "aws-sdk/clients/iam"
@@ -27,7 +26,7 @@ const sqs = new SQS()
 export const del = async (cId: ConsumerId): Promise<void> => {
   const lgName = logGroupName(cId)
   const fName = filterName(cId)
-  log(`Deleting metric filter ${fName} from ${lgName}`)
+  console.log(`Deleting metric filter ${fName} from ${lgName}`)
   await ignore404(() =>
     cwl
       .deleteMetricFilter({
@@ -37,7 +36,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
       .promise()
   )
 
-  log(`Deleting log group ${lgName}`)
+  console.log(`Deleting log group ${lgName}`)
   await ignore404(() => cwl.deleteLogGroup({ logGroupName: lgName }).promise())
 
   const aNames = [
@@ -45,7 +44,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
     lambdaErrorAlarmName(cId),
     logErrorAlarmName(cId),
   ]
-  log(`Deleting alarms ${aNames.join(", ")}`)
+  console.log(`Deleting alarms ${aNames.join(", ")}`)
   await ignore404(() => cw.deleteAlarms({ AlarmNames: aNames }).promise())
 
   await exec(lam, cId, async (uuid: string, state?: string) =>
@@ -55,11 +54,11 @@ export const del = async (cId: ConsumerId): Promise<void> => {
   )
 
   const lName = lambdaName(cId)
-  log(`Deleting lambda ${lName}`)
+  console.log(`Deleting lambda ${lName}`)
   await ignore404(() => lam.deleteFunction({ FunctionName: lName }).promise())
 
   const qName = queueName(cId)
-  log(`Deleting queue ${qName}`)
+  console.log(`Deleting queue ${qName}`)
   const qr = await ignore404<GetQueueUrlResult>(() =>
     sqs.getQueueUrl({ QueueName: qName }).promise()
   )
@@ -69,14 +68,14 @@ export const del = async (cId: ConsumerId): Promise<void> => {
     const rn = roleName(cId)
     const rr = await iam.getRole({ RoleName: rn }).promise()
     const pa = rr.Role.Arn.replace(/role/g, "policy")
-    log(`Detaching ${rn} from ${pa}`)
+    console.log(`Detaching ${rn} from ${pa}`)
     await ignore404(() =>
       iam.detachRolePolicy({ RoleName: rn, PolicyArn: pa }).promise()
     )
-    log(`Deleting ${pa}`)
+    console.log(`Deleting ${pa}`)
     await ignore404(() => iam.deletePolicy({ PolicyArn: pa }).promise())
-    log(`Deleting ${rn}`)
+    console.log(`Deleting ${rn}`)
     await ignore404(() => iam.deleteRole({ RoleName: rn }).promise())
   })
-  log("Complete")
+  console.log("Complete")
 }

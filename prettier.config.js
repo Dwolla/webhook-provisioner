@@ -1,1 +1,1 @@
-module.exports = require("skripts/config").prettier
+module.exports = { semi: false }
