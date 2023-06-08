@@ -14,6 +14,7 @@ import {
   StackProps,
   Tag,
   CfnResource,
+  Fn,
 } from "@aws-cdk/core"
 import { envVar } from "@therockstorm/utils"
 import { name } from "../package.json"
@@ -178,7 +179,10 @@ const create = async () => {
   const stack = new MyStack(
     app,
     "Stack",
-    `arn:aws:sns:us-west-2:455620323323:cloudwatch-alarm-to-slack-topic-${ENV}`
+    Fn.sub(
+      "arn:aws:sns:us-west-2:${AWS::AccountId}" +
+        `:cloudwatch-alarm-to-slack-${ENV}`
+    )
   )
   stack.node.applyAspect(new Tag("Environment", ENV))
   stack.node.applyAspect(new Tag("Project", PROJECT))
