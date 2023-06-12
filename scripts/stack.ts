@@ -1,8 +1,4 @@
-import {
-  ComparisonOperator,
-  DimensionHash,
-  Metric,
-} from "@aws-cdk/aws-cloudwatch"
+import { ComparisonOperator, Metric } from "@aws-cdk/aws-cloudwatch"
 import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
 import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
 import { ITopic, Topic } from "@aws-cdk/aws-sns"
@@ -14,17 +10,18 @@ import {
   StackProps,
   Tag,
   CfnResource,
+  Aspects,
 } from "@aws-cdk/core"
-import { envVar, error } from "@therockstorm/utils"
-import SNS from "aws-sdk/clients/sns"
 import { name } from "../package.json"
+import { ENV } from "../src/util"
+import { DimensionsMap } from "@aws-cdk/aws-cloudwatch/lib/metric"
 
 type AlarmProps = Readonly<{
   alarmName: string
   metricName: string
   namespace: string
   comparisonOperator?: ComparisonOperator
-  dimensions?: DimensionHash
+  dimensions?: DimensionsMap
   evaluationPeriods?: number
   period?: Duration
   statistic?: string
@@ -39,7 +36,6 @@ type QueueProps = Readonly<{
 }>
 
 const BUILD_URL = process.env.BUILD_URL
-const ENV = envVar("ENVIRONMENT")
 const GIT_COMMIT = process.env.GIT_COMMIT
 const GIT_URL = process.env.GIT_URL
 const PROJECT = "webhooks"
@@ -59,8 +55,11 @@ const capitalize = (s: string) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`
 class MyStack extends Stack {
   private topic: ITopic
 
-  constructor(parent: App, id: string, topicArn: string, props?: StackProps) {
+  constructor(parent: App, id: string, topicName: string, props?: StackProps) {
     super(parent, id, props)
+
+    const topicArn = `arn:aws:sns:${this.region}:${this.account}:${topicName}`
+
     this.topic = Topic.fromTopicArn(this, "SnsTopic", topicArn)
     ;[
       {
@@ -92,7 +91,6 @@ class MyStack extends Stack {
 
     const queue = () => {
       const newQueue = new Queue(this, ref, {
-        // tslint:disable-line
         queueName,
         retentionPeriod: Duration.days(14),
         visibilityTimeout: Duration.minutes(3),
@@ -157,9 +155,11 @@ class MyStack extends Stack {
 
   private metricAlarm = (ref: string, props: AlarmProps) =>
     new Metric({
-      dimensions: props.dimensions,
+      dimensionsMap: props.dimensions,
       metricName: props.metricName,
       namespace: props.namespace,
+      statistic: props.statistic || "Sum",
+      period: props.period || Duration.minutes(1),
     })
       .createAlarm(this, ref, {
         alarmName: props.alarmName,
@@ -167,39 +167,34 @@ class MyStack extends Stack {
           props.comparisonOperator ||
           ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
         evaluationPeriods: props.evaluationPeriods || 1,
-        period: props.period || Duration.minutes(1),
-        statistic: props.statistic || "Sum",
         threshold: props.threshold || 1,
       })
       .addAlarmAction(new SnsAction(this.topic))
 }
 
 const create = async () => {
-  let arn = ""
-  try {
-    arn = (
-      await new SNS({ region: REGION })
-        .createTopic({ Name: `cloudwatch-alarm-to-slack-topic-${ENV}` })
-        .promise()
-    ).TopicArn as string
-  } catch (e) {
-    error({ code: e.code, message: e.message })
-  }
   const app = new App()
-  const stack = new MyStack(app, "Stack", arn)
-  stack.node.applyAspect(new Tag("Environment", ENV))
-  stack.node.applyAspect(new Tag("Project", PROJECT))
-  stack.node.applyAspect(new Tag("Creator", "serverless"))
-  stack.node.applyAspect(new Tag("Team", "growth"))
-  stack.node.applyAspect(new Tag("Visibility", "external"))
+  const stack = new MyStack(
+    app,
+    "Stack",
+    `cloudwatch-alarm-to-slack-topic-${ENV}`
+  )
+  const stackAspects = Aspects.of(stack)
+  stackAspects.add(new Tag("Environment", ENV))
+  stackAspects.add(new Tag("Project", PROJECT))
+  stackAspects.add(new Tag("Environment", ENV))
+  stackAspects.add(new Tag("Project", PROJECT))
+  stackAspects.add(new Tag("Creator", "serverless"))
+  stackAspects.add(new Tag("Team", "growth"))
+  stackAspects.add(new Tag("Visibility", "external"))
   if (BUILD_URL) {
-    stack.node.applyAspect(new Tag("DeployJobUrl", BUILD_URL))
+    stackAspects.add(new Tag("DeployJobUrl", BUILD_URL))
   }
   if (GIT_URL) {
-    stack.node.applyAspect(new Tag("org.label-schema.vcs-url", GIT_URL))
+    stackAspects.add(new Tag("org.label-schema.vcs-url", GIT_URL))
   }
   if (GIT_COMMIT) {
-    stack.node.applyAspect(new Tag("org.label-schema.vcs-ref", GIT_COMMIT))
+    stackAspects.add(new Tag("org.label-schema.vcs-ref", GIT_COMMIT))
   }
   app.synth()
 }

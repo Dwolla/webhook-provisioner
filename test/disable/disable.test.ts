@@ -5,8 +5,8 @@ import * as mapper from "../../src/mapper"
 jest.mock("aws-sdk/clients/lambda")
 jest.mock("aws-sdk/clients/sqs")
 jest.mock("../../src/mapper")
-const lam = (Lambda as unknown) as jest.Mock
-const sqs = (SQS as unknown) as jest.Mock
+const lam = Lambda as unknown as jest.Mock
+const sqs = SQS as unknown as jest.Mock
 const listEventSourceMappings = jest.fn()
 const updateEventSourceMapping = jest.fn()
 const getQueueUrl = jest.fn()

@@ -21,7 +21,10 @@ const createRole = cr.createRole as jest.Mock
 import { create } from "../../src/create/create"
 
 test("create", async () => {
-  const createEvent = { consumerId: 123, concurrency: { reserved: 2, post: 5 } }
+  const createEvent = {
+    consumerId: 123,
+    concurrency: { reserved: 2, post: 5 },
+  }
   const timeout = 32
   const lCode = { x: 0 }
   const logGroup = { x: 1 }

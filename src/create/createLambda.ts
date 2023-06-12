@@ -1,4 +1,3 @@
-import { log } from "@therockstorm/utils"
 import Lambda from "aws-sdk/clients/lambda"
 import { CreateFuncReq, IFunc } from ".."
 import { logRes, retry } from "../util"
@@ -7,6 +6,7 @@ import {
   toCreateFunc,
   toPutFuncConcurrency,
 } from "./mapper"
+import { log } from "../logger"
 
 const lam = new Lambda()
 

@@ -1,10 +1,10 @@
-import { log, thrw, warn } from "@therockstorm/utils"
 import Lambda from "aws-sdk/clients/lambda"
 import SQS, { GetQueueUrlResult } from "aws-sdk/clients/sqs"
 import { ConsumerId, IDisableEvent } from ".."
 import { update } from "../eventSources"
 import { queueName } from "../mapper"
 import { ignore404 } from "../util"
+import { log, warn } from "../logger"
 
 const lam = new Lambda()
 const sqs = new SQS()
@@ -27,10 +27,12 @@ const purge = async (cId: ConsumerId) => {
     try {
       log(`Purging queue ${qName}`)
       await sqs.purgeQueue({ QueueUrl: qr.QueueUrl as string }).promise()
-    } catch (e) {
-      e.code && e.code === "AWS.SimpleQueueService.PurgeQueueInProgress"
-        ? warn(e.message)
-        : thrw(e)
+    } catch (e: any) {
+      if (e.code && e.code === "AWS.SimpleQueueService.PurgeQueueInProgress") {
+        warn(e.message)
+        return
+      }
+      throw new Error(e)
     }
   }
 }

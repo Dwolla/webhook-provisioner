@@ -3,23 +3,24 @@
   "version": "1.0.0",
   "scripts": {
     "build": "ENVIRONMENT=local sls webpack",
-    "build:stack": "cd scripts && tsc && cdk synth Stack --app 'node stack.js' --no-version-reporting --strict > stack.yml",
-    "clean": "skripts clean scripts --pattern '*.js'",
+    "build:stack": "cd scripts && tsc --project ./tsconfig.json && cdk synth Stack --app 'node stack.js' --no-version-reporting --strict > stack.yml",
     "deploy": "npm run build:stack && sls deploy",
-    "format": "skripts format",
-    "jest": "ENVIRONMENT=test DEPLOYMENT_BUCKET=bucket RETRIES_MAX=8 jest",
-    "lint": "skripts lint --fix",
+    "format": "prettier --config prettier.config.js --ignore-path .prettierignore --write \"./**/*.+(js|jsx|ts|tsx|json|yml|yaml|md|html|css|less|scss|graphql)\" ",
+    "jest": "jest",
+    "lint": "eslint --fix --config .eslintrc --ext '.ts,.tsx,.js,.jsx' '.'",
     "start": "npm run build && cd .webpack/service && node server.js",
-    "test": "npm run lint && npm run build:stack && npm run jest && sls package",
+    "test": "export ENVIRONMENT=test && export DEPLOYMENT_BUCKET=bucket && export RETRIES_MAX=8 && npm run lint && npm run build:stack && npm run jest && sls package",
     "watch": "npm run jest -- --watch"
   },
   "dependencies": {
-    "@therockstorm/utils": "^3.0.11",
-    "async-retry": "^1.2.3",
+    "@types/serverless": "^3.12.12",
+    "async-retry": "^1.3.3",
     "axios": "^0.19.0",
+    "lint-staged": "^13.2.2",
     "p-limit": "^2.2.1",
     "p-throttle": "^4.1.1",
-    "source-map-support": "^0.5.13"
+    "source-map-support": "^0.5.13",
+    "ts-loader": "^9.4.3"
   },
   "devDependencies": {
     "@aws-cdk/aws-cloudwatch": "^1.4.0",
@@ -28,19 +29,30 @@
     "@aws-cdk/aws-sns": "^1.4.0",
     "@aws-cdk/aws-sqs": "^1.4.0",
     "@aws-cdk/core": "^1.4.0",
-    "@types/async-retry": "^1.4.1",
+    "@types/async-retry": "^1.4.5",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.2.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.9",
+    "@typescript-eslint/parser": "^5.59.9",
     "aws-cdk": "^1.4.0",
     "aws-sdk": "^2.1243.0",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "husky": "^3.0.4",
+    "jest": "^29.5.0",
+    "serverless": "^3.32.2",
     "serverless-iam-roles-per-function": "3.0.0-d84bffd",
-    "serverless-pseudo-parameters": "^2.4.0",
-    "skripts": "^0.8.2",
+    "serverless-webpack": "^5.11.0",
+    "ts-jest": "^29.1.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.9.7"
+    "typescript": "^4.8.4",
+    "webpack": "^5.85.1",
+    "webpack-node-externals": "^3.0.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "skripts pre-commit"
+      "pre-commit": "npx lint-staged --config .lintstagedrc.json"
     }
   }
 }
