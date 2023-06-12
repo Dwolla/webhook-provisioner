@@ -3,14 +3,7 @@ import { AWSError } from "aws-sdk"
 import { IConcurrency, Res } from "."
 import { toRes } from "./mapper"
 import { error, log, warn } from "./logger"
-
-export const envVarRequired = (name: string): string => {
-  const envVar = process.env[name]
-  if (envVar) {
-    return envVar
-  }
-  throw new Error(`${name} required`)
-}
+import { envVarRequired } from "./envVarUtil"
 
 export const BATCH = 10
 export const DEPLOYMENT_BUCKET = envVarRequired("DEPLOYMENT_BUCKET")

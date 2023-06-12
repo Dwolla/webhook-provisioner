@@ -13,8 +13,8 @@ import {
   Aspects,
 } from "@aws-cdk/core"
 import { name } from "../package.json"
-import { ENV } from "../src/util"
 import { DimensionsMap } from "@aws-cdk/aws-cloudwatch/lib/metric"
+import { envVarRequired } from "../src/envVarUtil"
 
 type AlarmProps = Readonly<{
   alarmName: string
@@ -40,6 +40,7 @@ const GIT_COMMIT = process.env.GIT_COMMIT
 const GIT_URL = process.env.GIT_URL
 const PROJECT = "webhooks"
 const REGION = process.env.AWS_REGION || "us-west-2"
+const ENV = envVarRequired("ENVIRONMENT")
 
 const resourceName = (
   resource: string,
