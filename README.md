@@ -11,4 +11,4 @@ Lambda functions to create, update, and delete partner-specific webhook SQS queu
 ## Developing
 
 - Run tests, `ENVIRONMENT=local npm test`
-- Invoke locally, `npm run start` and browse to the localhost port logged.
+- Invoke locally, `npm run start` and browse to the localhost port logged
