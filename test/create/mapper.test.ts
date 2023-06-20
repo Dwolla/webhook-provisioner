@@ -1,4 +1,5 @@
 import * as mapper from "../../src/mapper"
+import { when } from "jest-when"
 
 jest.mock("../../src/mapper")
 const lambdaName = mapper.lambdaName as jest.Mock
@@ -8,7 +9,7 @@ const metricName = mapper.metricName as jest.Mock
 const lambdaErrorAlarmName = mapper.lambdaErrorAlarmName as jest.Mock
 const logErrorAlarmName = mapper.logErrorAlarmName as jest.Mock
 const policyName = mapper.policyName as jest.Mock
-const queueName = mapper.queueName as jest.Mock
+const queueName = jest.mocked(mapper.queueName)
 const queueDepthAlarmName = mapper.queueDepthAlarmName as jest.Mock
 const roleName = mapper.roleName as jest.Mock
 import {
@@ -31,12 +32,13 @@ import {
 
 const BATCH = 10
 const CONSUMER_ID = 123
+const APPLICATION_ID = "72030ef9-5ed4-4862-a703-909a4e545c53"
 const ENV = "test"
 const FUNCTION_TIMEOUT_SEC = 11 * BATCH
 const PROJECT = "webhooks"
 const URL = "url"
 const TOPIC_ARN = "arn:aws:sns:us-west-2:000000000000:webhooks-topic-test"
-const TAGS = {
+const CONSUMER_TAGS = {
   ConsumerId: CONSUMER_ID.toString(),
   Creator: "webhook-provisioner",
   Environment: ENV,
@@ -44,30 +46,69 @@ const TAGS = {
   Team: "growth",
   Visibility: "internal",
 }
+const APPLICATION_TAGS = {
+  ConsumerId: APPLICATION_ID,
+  Creator: "webhook-provisioner",
+  Environment: ENV,
+  Project: PROJECT,
+  Team: "growth",
+  Visibility: "internal",
+}
 
-test("toCreateQueue", () => {
-  const qn = "qn"
-  const dlqArn = "dlqArn"
-  queueName.mockReturnValue(qn)
+describe("toCreateQueue", () => {
+  test("builds the queue attributes with a numeric consumer id", () => {
+    const qn = "qn"
+    const dlqArn = "dlqArn"
 
-  expect(toCreateQueue(CONSUMER_ID, dlqArn, FUNCTION_TIMEOUT_SEC)).toEqual({
-    Attributes: {
-      MessageRetentionPeriod: "1209600",
-      RedrivePolicy: JSON.stringify({
-        deadLetterTargetArn: dlqArn,
-        maxReceiveCount: 10,
-      }),
-      VisibilityTimeout: (FUNCTION_TIMEOUT_SEC * 6).toString(),
-    },
-    QueueName: qn,
+    when(queueName).calledWith(CONSUMER_ID).mockReturnValue(qn)
+
+    expect(toCreateQueue(CONSUMER_ID, dlqArn, FUNCTION_TIMEOUT_SEC)).toEqual({
+      Attributes: {
+        MessageRetentionPeriod: "1209600",
+        RedrivePolicy: JSON.stringify({
+          deadLetterTargetArn: dlqArn,
+          maxReceiveCount: 10,
+        }),
+        VisibilityTimeout: (FUNCTION_TIMEOUT_SEC * 6).toString(),
+      },
+      QueueName: qn,
+    })
+  })
+  test("builds the queue attributes with a string consumer id", () => {
+    const qn = "qn-2"
+    const dlqArn = "dlqArn"
+
+    when(queueName).calledWith(APPLICATION_ID).mockReturnValue(qn)
+
+    expect(toCreateQueue(APPLICATION_ID, dlqArn, FUNCTION_TIMEOUT_SEC)).toEqual(
+      {
+        Attributes: {
+          MessageRetentionPeriod: "1209600",
+          RedrivePolicy: JSON.stringify({
+            deadLetterTargetArn: dlqArn,
+            maxReceiveCount: 10,
+          }),
+          VisibilityTimeout: (FUNCTION_TIMEOUT_SEC * 6).toString(),
+        },
+        QueueName: qn,
+      }
+    )
   })
 })
 
-test("toTagQueue", () =>
-  expect(toTagQueue(CONSUMER_ID, URL)).toEqual({
-    QueueUrl: URL,
-    Tags: TAGS,
-  }))
+describe("toTagQueue", () => {
+  test("toTagQueue maps an int id", () =>
+    expect(toTagQueue(CONSUMER_ID, URL)).toEqual({
+      QueueUrl: URL,
+      Tags: CONSUMER_TAGS,
+    }))
+
+  test("toTagQueue maps a string id", () =>
+    expect(toTagQueue(APPLICATION_ID, URL)).toEqual({
+      QueueUrl: URL,
+      Tags: APPLICATION_TAGS,
+    }))
+})
 
 test("toGetQueueAttributes", () =>
   expect(toGetQueueAttributes(URL)).toEqual({
@@ -81,7 +122,7 @@ test("toCreateLogGroup", () => {
 
   expect(toCreateLogGroup(CONSUMER_ID)).toEqual({
     logGroupName: lgn,
-    tags: TAGS,
+    tags: CONSUMER_TAGS,
   })
 })
 
@@ -225,7 +266,7 @@ test("toCreateFunc", () => {
     Publish: true,
     Role: req.role.roleArn,
     Runtime: "nodejs16.x",
-    Tags: TAGS,
+    Tags: CONSUMER_TAGS,
     Timeout: req.timeout,
   })
 })

@@ -27,6 +27,7 @@ test("update", async () => {
     version: (ver + 1).toString(),
   }
   const validLambdaName = (n: number) => `webhooks-${n}-lambda-test`
+  const validLambdaNameWithApplicationId = `webhooks-2b1118af-764a-457f-b964-e139d77145c9-lambda-test`
   let i = 0
   const noName = { Environment: { Variables: { VERSION: ver.toString() } } }
   const wrongName = {
@@ -51,6 +52,12 @@ test("update", async () => {
     },
     FunctionName: functionName,
   }
+  const olderVersWithString = {
+    Environment: {
+      Variables: { VERSION: ver.toString(), CONCURRENCY: concurrency },
+    },
+    FunctionName: validLambdaNameWithApplicationId,
+  }
   listFunctions.mockReturnValueOnce({
     promise: () => ({
       Functions: [
@@ -62,6 +69,7 @@ test("update", async () => {
         sameVer,
         newerVer,
         olderVer,
+        olderVersWithString,
       ],
       NextMarker: 1,
     }),
@@ -74,7 +82,10 @@ test("update", async () => {
     promise: () => ({ FunctionArn: resourceName }),
   })
 
-  await expect(updateAll()).resolves.toEqual([{ arn: resourceName }])
+  await expect(updateAll()).resolves.toEqual([
+    { arn: resourceName },
+    { arn: resourceName },
+  ])
 
   expect(latestCode).toHaveBeenCalledTimes(1)
   expect(listFunctions).toHaveBeenCalledTimes(2)
@@ -86,9 +97,18 @@ test("update", async () => {
     S3Bucket: configurationRequest.bucket,
     S3Key: configurationRequest.key,
   })
-  expect(waitFor).toHaveBeenCalledTimes(1)
+  expect(updateFunctionCode).toHaveBeenCalledWith({
+    FunctionName: validLambdaNameWithApplicationId,
+    Publish: true,
+    S3Bucket: configurationRequest.bucket,
+    S3Key: configurationRequest.key,
+  })
+  expect(waitFor).toHaveBeenCalledTimes(2)
   expect(waitFor).toHaveBeenCalledWith("functionUpdatedV2", {
     FunctionName: functionName,
+  })
+  expect(waitFor).toHaveBeenCalledWith("functionUpdatedV2", {
+    FunctionName: validLambdaNameWithApplicationId,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: {
@@ -98,6 +118,18 @@ test("update", async () => {
       },
     },
     FunctionName: functionName,
+    MemorySize: 128,
+    Runtime: "nodejs16.x",
+    Timeout: 32,
+  })
+  expect(updateFunctionConfiguration).toHaveBeenCalledWith({
+    Environment: {
+      Variables: {
+        CONCURRENCY: concurrency,
+        VERSION: configurationRequest.version,
+      },
+    },
+    FunctionName: validLambdaNameWithApplicationId,
     MemorySize: 128,
     Runtime: "nodejs16.x",
     Timeout: 32,
