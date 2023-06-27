@@ -1,4 +1,4 @@
-export type ConsumerId = number
+export type ConsumerId = number | string
 
 export interface IEvent {
   consumerId: ConsumerId
