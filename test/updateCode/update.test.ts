@@ -27,7 +27,8 @@ test("update", async () => {
     version: (ver + 1).toString(),
   }
   const validLambdaName = (n: number) => `webhooks-${n}-lambda-test`
-  const validLambdaNameWithApplicationId = `webhooks-2b1118af-764a-457f-b964-e139d77145c9-lambda-test`
+  const validLambdaNameWithApplicationId = (n: number) =>
+    `webhooks-app${n}-lambda-test`
   let i = 0
   const noName = { Environment: { Variables: { VERSION: ver.toString() } } }
   const wrongName = {
@@ -52,11 +53,13 @@ test("update", async () => {
     },
     FunctionName: functionName,
   }
+
+  const stringFunctionName = validLambdaNameWithApplicationId(i++)
   const olderVersWithString = {
     Environment: {
       Variables: { VERSION: ver.toString(), CONCURRENCY: concurrency },
     },
-    FunctionName: validLambdaNameWithApplicationId,
+    FunctionName: stringFunctionName,
   }
   listFunctions.mockReturnValueOnce({
     promise: () => ({
@@ -98,7 +101,7 @@ test("update", async () => {
     S3Key: configurationRequest.key,
   })
   expect(updateFunctionCode).toHaveBeenCalledWith({
-    FunctionName: validLambdaNameWithApplicationId,
+    FunctionName: stringFunctionName,
     Publish: true,
     S3Bucket: configurationRequest.bucket,
     S3Key: configurationRequest.key,
@@ -108,7 +111,7 @@ test("update", async () => {
     FunctionName: functionName,
   })
   expect(waitFor).toHaveBeenCalledWith("functionUpdatedV2", {
-    FunctionName: validLambdaNameWithApplicationId,
+    FunctionName: stringFunctionName,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
     Environment: {
@@ -129,7 +132,7 @@ test("update", async () => {
         VERSION: configurationRequest.version,
       },
     },
-    FunctionName: validLambdaNameWithApplicationId,
+    FunctionName: stringFunctionName,
     MemorySize: 128,
     Runtime: "nodejs16.x",
     Timeout: 32,

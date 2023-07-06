@@ -32,7 +32,7 @@ import {
 
 const BATCH = 10
 const CONSUMER_ID = 123
-const APPLICATION_ID = "72030ef9-5ed4-4862-a703-909a4e545c53"
+const APPLICATION_ID = "app456"
 const ENV = "test"
 const FUNCTION_TIMEOUT_SEC = 11 * BATCH
 const PROJECT = "webhooks"

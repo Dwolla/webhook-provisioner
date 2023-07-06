@@ -15,9 +15,7 @@ const throttle = pThrottle({
   interval: 2500,
 })
 
-const webhookPattern = new RegExp(
-  `^webhooks-\\d+|[[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}]-lambda-${ENV}$`
-)
+const webhookPattern = new RegExp(`^webhooks-(\\d+|app\\d+)-lambda-${ENV}$`)
 
 type Fn = Readonly<{ name: string; vars: EV }>
 type Partition<T> = [T[], T[]]
