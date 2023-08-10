@@ -15,7 +15,7 @@ describe("validateConcurrency", () => {
 
   it("default if undefined", () => con({} as IConcurrency, 2, 5))
   it("set to minimum if 0", () => con({ reserved: 0, post: 0 }, 1, 1))
-  it("set to max if too high", () => con({ reserved: 11, post: 11 }, 10, 10))
+  it("set to max if too high", () => con({ reserved: 16, post: 11 }, 15, 10))
   it("return what was passed", () => con({ reserved: 8, post: 8 }, 8, 8))
 })
 
