@@ -16,7 +16,7 @@ const MISC_TIMEOUT = 2
 const RETRIES_MAX = envVarRequired("RETRIES_MAX")
 
 export const validateConcurrency = (con: IConcurrency) => {
-  con.reserved = validate(con.reserved, 1, 10, 2)
+  con.reserved = validate(con.reserved, 1, 15, 2)
   con.post = validate(con.post, 1, BATCH, 5)
   return con
 }
