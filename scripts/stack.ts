@@ -1,26 +1,27 @@
-import { ComparisonOperator, Metric } from "@aws-cdk/aws-cloudwatch"
-import { SnsAction } from "@aws-cdk/aws-cloudwatch-actions"
-import { CfnMetricFilter, LogGroup } from "@aws-cdk/aws-logs"
-import { ITopic, Topic } from "@aws-cdk/aws-sns"
-import { Queue } from "@aws-cdk/aws-sqs"
 import {
-  App,
+  aws_cloudwatch as cloudwatch,
+  aws_cloudwatch_actions as cloudwatch_actions,
+  aws_logs as logs,
+  aws_sns as sns,
+  aws_sqs as sqs,
   Duration,
+  App,
   Stack,
   StackProps,
   Tag,
   CfnResource,
   Aspects,
-} from "@aws-cdk/core"
+} from "aws-cdk-lib"
 import { name } from "../package.json"
-import { DimensionsMap } from "@aws-cdk/aws-cloudwatch/lib/metric"
+import { DimensionsMap } from "aws-cdk-lib/aws-cloudwatch"
 import { envVarRequired } from "../src/envVarUtil"
+import { CfnMetricFilter } from "aws-cdk-lib/aws-logs"
 
 type AlarmProps = Readonly<{
   alarmName: string
   metricName: string
   namespace: string
-  comparisonOperator?: ComparisonOperator
+  comparisonOperator?: cloudwatch.ComparisonOperator
   dimensions?: DimensionsMap
   evaluationPeriods?: number
   period?: Duration
@@ -54,14 +55,14 @@ const resourceName = (
 const capitalize = (s: string) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`
 
 class MyStack extends Stack {
-  private topic: ITopic
+  private topic: sns.ITopic
 
   constructor(parent: App, id: string, topicName: string, props?: StackProps) {
     super(parent, id, props)
 
     const topicArn = `arn:aws:sns:${this.region}:${this.account}:${topicName}`
 
-    this.topic = Topic.fromTopicArn(this, "SnsTopic", topicArn)
+    this.topic = sns.Topic.fromTopicArn(this, "SnsTopic", topicArn)
     ;[
       {
         metricName: "ApproximateAgeOfOldestMessage",
@@ -91,7 +92,7 @@ class MyStack extends Stack {
     const ref = `${capped}Queue`
 
     const queue = () => {
-      const newQueue = new Queue(this, ref, {
+      const newQueue = new sqs.Queue(this, ref, {
         queueName,
         retentionPeriod: Duration.days(14),
         visibilityTimeout: Duration.minutes(3),
@@ -126,12 +127,13 @@ class MyStack extends Stack {
     const namespace = "LogMetrics"
 
     const errorFilter = () => {
-      const logGroup = LogGroup.fromLogGroupArn(
+      const logGroup = logs.LogGroup.fromLogGroupArn(
         this,
         `${capped}LogGroup`,
         `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`
       )
-      const filter = logGroup.addMetricFilter(`${ref}ErrorFilter`, {
+      const filter = new logs.MetricFilter(this, `${ref}ErrorFilter`, {
+        logGroup,
         filterPattern: { logPatternString: '"[error]"' },
         metricName,
         metricNamespace: namespace,
@@ -155,7 +157,7 @@ class MyStack extends Stack {
   }
 
   private metricAlarm = (ref: string, props: AlarmProps) =>
-    new Metric({
+    new cloudwatch.Metric({
       dimensionsMap: props.dimensions,
       metricName: props.metricName,
       namespace: props.namespace,
@@ -166,11 +168,11 @@ class MyStack extends Stack {
         alarmName: props.alarmName,
         comparisonOperator:
           props.comparisonOperator ||
-          ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
+          cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
         evaluationPeriods: props.evaluationPeriods || 1,
         threshold: props.threshold || 1,
       })
-      .addAlarmAction(new SnsAction(this.topic))
+      .addAlarmAction(new cloudwatch_actions.SnsAction(this.topic))
 }
 
 const create = async () => {
@@ -186,7 +188,6 @@ const create = async () => {
   stackAspects.add(new Tag("Environment", ENV))
   stackAspects.add(new Tag("Project", PROJECT))
   stackAspects.add(new Tag("Creator", "serverless"))
-  stackAspects.add(new Tag("Team", "growth"))
   stackAspects.add(new Tag("Visibility", "external"))
   if (BUILD_URL) {
     stackAspects.add(new Tag("DeployJobUrl", BUILD_URL))
