@@ -122,7 +122,7 @@ test("update", async () => {
     },
     FunctionName: functionName,
     MemorySize: 128,
-    Runtime: "nodejs16.x",
+    Runtime: "nodejs20.x",
     Timeout: 32,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
@@ -134,7 +134,7 @@ test("update", async () => {
     },
     FunctionName: stringFunctionName,
     MemorySize: 128,
-    Runtime: "nodejs16.x",
+    Runtime: "nodejs20.x",
     Timeout: 32,
   })
 })
