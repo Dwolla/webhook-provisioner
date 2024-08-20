@@ -292,7 +292,7 @@ module.exports = {
     stage: "${opt:stage, env:ENVIRONMENT}",
     tags: "${self:custom.tags}",
     timeout: 30,
-    runtime: "nodejs18.x",
+    runtime: "nodejs20.x",
   },
   resources: "${file(./scripts/stack.yml)}",
 }
