@@ -266,6 +266,36 @@ module.exports = {
       ],
       timeout: 120,
     },
+    updateConsumersCode: {
+      handler: "src/updateCode/handler.updateConsumersCodeHandler",
+      iamRoleStatements: [
+        {
+          Effect: "Allow",
+          Action: ["s3:ListBucket"],
+          Resource: "${self:custom.bucketArn}",
+        },
+        {
+          Effect: "Allow",
+          Action: ["s3:GetObject"],
+          Resource: "${self:custom.keyArn}",
+        },
+        {
+          Effect: "Allow",
+          Action: ["lambda:ListFunctions"],
+          Resource: "*",
+        },
+        {
+          Effect: "Allow",
+          Action: [
+            "lambda:UpdateFunctionCode",
+            "lambda:UpdateFunctionConfiguration",
+            "lambda:GetFunction",
+          ],
+          Resource: "${self:custom.lambdaArn}",
+        },
+      ],
+      timeout: 120,
+    },
   },
   package: {
     individually: '${file(./config.js):packageIndividually(), "false"}',

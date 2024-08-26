@@ -1,3 +1,5 @@
+import { Handler } from "aws-lambda/handler"
+
 export type ConsumerId = number | string
 
 export interface IEvent {
@@ -56,6 +58,25 @@ export type CreateFuncReq = Readonly<{
 export interface IFunc {
   arn: string
   eventSourceId?: string
+  name?: string
 }
 
 export type LogGroup = Readonly<{ arn: string }>
+
+export type UpdateConsumersCodeRequest = {
+  consumerIds: ConsumerId[]
+  nodeVersion: string
+  codeName: string
+}
+
+export type UpdateConsumersCodeResponse = {
+  statusCode: number
+  body: {
+    message: string
+  }
+}
+
+export type UpdateConsumersCodeHandler = Handler<
+  UpdateConsumersCodeRequest,
+  UpdateConsumersCodeResponse
+>

@@ -10,6 +10,7 @@ import {
   queueName,
   resultQueueName,
   roleName,
+  s3ToLocation,
   topicName,
 } from "../src/mapper"
 
@@ -53,3 +54,17 @@ test("roleName", () =>
 
 test("topicName", () =>
   expect(topicName()).toBe(`cloudwatch-alarm-to-slack-topic-test`))
+
+describe("s3ToLocation", () => {
+  test("should s3 bucket and key to a Location", () => {
+    const bucket = "bucket"
+    const version = "2024-09-01T16:41:33.184Z"
+    const key = `serverless/webhook-handler/test/1549039293184-${version}/func.zip`
+
+    expect(s3ToLocation(bucket, key)).toStrictEqual({
+      bucket,
+      key,
+      version,
+    })
+  })
+})
