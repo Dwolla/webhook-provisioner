@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.5",
+    "@types/aws-lambda": "^8.10.143",
     "@types/jest": "^29.5.2",
     "@types/jest-when": "3.5.2",
     "@types/node": "^20.2.5",

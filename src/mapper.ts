@@ -1,4 +1,4 @@
-import { ConsumerId, Res } from "."
+import { ConsumerId, Location, Res } from "."
 import { ENV, PROJECT, REGION } from "./util"
 
 export const toRes = (body: object, statusCode = 200): Res => ({
@@ -46,3 +46,12 @@ const resourceName = (
   `${PROJECT}${
     typeof resourceId === "undefined" ? "" : `-${resourceId}`
   }-${resource}${includeRegion ? `-${REGION}` : ""}-${ENV}`
+
+export const s3ToLocation = (bucket: string, key: string): Location => {
+  const version = key.split("/")[3].split("-").slice(1).join("-")
+  return {
+    bucket,
+    key,
+    version,
+  }
+}

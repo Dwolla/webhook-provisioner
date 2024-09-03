@@ -4,10 +4,18 @@ import Lambda, {
   FunctionList,
 } from "aws-sdk/clients/lambda"
 import pThrottle from "p-throttle"
-import { IFunc, Location } from ".."
-import { latestCode } from "../latestCode"
+import {
+  ConsumerId,
+  IFunc,
+  Location,
+  UpdateConsumersCodeRequest,
+  UpdateConsumersCodeResponse,
+} from ".."
+import { codeExists, latestCode } from "../latestCode"
 import { calculateFuncTimeout, ENV, logRes } from "../util"
-import { log } from "../logger"
+import { error, log } from "../logger"
+import { lambdaName } from "../mapper"
+import { getLambdaEnvVars } from "../lambdaHelpers"
 
 const lambdaClient = new Lambda()
 const throttle = pThrottle({
@@ -22,35 +30,67 @@ type Partition<T> = [T[], T[]]
 const FULFILLED = "fulfilled"
 const REJECTED = "rejected"
 
+const throttled = throttle(
+  async (func: Fn, code: Location, runtime?: string) =>
+    await update(func, code, runtime)
+)
+
 export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFunctions()])
   const [upd, notUpd] = partition(
     fns,
     (f) => toEpoch(f.vars.VERSION) < toEpoch(lc.version)
   )
-  if (notUpd.length) {
-    log(`Not updating ${notUpd.map((f) => f.name).join(", ")}`)
-  }
-
-  const throttled = throttle(async (func: Fn) => {
-    return await update(func, lc)
-  })
+  logFunctionsNotUpdates(notUpd)
 
   const results = await Promise.allSettled(
-    upd.map(async (f) => await throttled(f))
+    upd.map(async (f) => await throttled(f, lc))
   )
+  logResults(results)
 
-  results.forEach((res, i) => {
-    if (res.status === REJECTED) {
-      const reason = (res as PromiseRejectedResult).reason
-      log(`Update failed for ${upd[i].name}. Reason: ${reason}`)
-    }
-  })
-
-  log("Complete")
+  log("Update all completed")
   return results
     .filter((r) => r.status === FULFILLED)
     .map((r) => (r as PromiseFulfilledResult<IFunc>).value)
+}
+
+export const updateByConsumerIds = async (
+  request: UpdateConsumersCodeRequest
+): Promise<UpdateConsumersCodeResponse> => {
+  const codeVersion = await codeExists(request.codeName)
+  const lambdas = await Promise.all(request.consumerIds.map(getLambdaDetails))
+
+  const [updateLambdas, upToDateLambdas] = partition(
+    lambdas,
+    (f) => toEpoch(f.vars.VERSION) != toEpoch(codeVersion.version)
+  )
+
+  logFunctionsNotUpdates(upToDateLambdas)
+
+  const results = await Promise.allSettled(
+    updateLambdas.map(
+      async (f) => await throttled(f, codeVersion, request.nodeVersion)
+    )
+  )
+  logResults(results)
+
+  log("Completed webhook handler updates")
+  return Promise.resolve({
+    statusCode: 200,
+    body: {
+      message: "Completed, verify logs for individual handler updates",
+    },
+  })
+}
+
+const getLambdaDetails = async (consumerId: ConsumerId): Promise<Fn> => {
+  const name = lambdaName(consumerId)
+  const lambdaEnvVars = await getLambdaEnvVars(name)
+
+  return {
+    name: name,
+    vars: lambdaEnvVars,
+  }
 }
 
 const allFunctions = async (): Promise<Fn[]> => {
@@ -87,7 +127,11 @@ function partition<T>(as: T[], pred: (a: T) => boolean) {
   )
 }
 
-const update = async (f: Fn, lc: Location): Promise<IFunc> =>
+const update = async (
+  f: Fn,
+  lc: Location,
+  runtime = "nodejs20.x"
+): Promise<IFunc> =>
   await logRes(`Updating ${f.name}`, async () => {
     await lambdaClient
       .updateFunctionCode({
@@ -107,10 +151,34 @@ const update = async (f: Fn, lc: Location): Promise<IFunc> =>
           Environment: { Variables: { ...f.vars, VERSION: lc.version } },
           FunctionName: f.name,
           MemorySize: 128,
-          Runtime: "nodejs20.x",
+          Runtime: runtime,
           Timeout: calculateFuncTimeout(f.vars.CONCURRENCY),
         })
         .promise()
     ).FunctionArn as string
-    return { arn }
+    return { arn, name: f.name }
   })
+
+const logResults = (results: PromiseSettledResult<IFunc>[]) => {
+  results.forEach((res, i) => {
+    if (res.status === REJECTED) {
+      const reason = (res as PromiseRejectedResult).reason
+      error(`Update failed for ${i}. Reason: ${reason}`)
+    }
+
+    if (res.status === FULFILLED) {
+      log(
+        `Update successful for lambdaName=${
+          (res as PromiseFulfilledResult<IFunc>).value.name
+        }`
+      )
+    }
+  })
+}
+
+const logFunctionsNotUpdates = (notUpdating: Fn[]) =>
+  notUpdating.forEach((lambda) =>
+    log(
+      `Lambda running the current version. No updates required name=${lambda.name}`
+    )
+  )

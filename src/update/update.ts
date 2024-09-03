@@ -1,10 +1,11 @@
-import Lambda, { EnvironmentVariables } from "aws-sdk/clients/lambda"
+import Lambda from "aws-sdk/clients/lambda"
 import SQS from "aws-sdk/clients/sqs"
 import pLimit from "p-limit"
 import { ConsumerId, IConcurrency, IFunc, IUpdateEvent } from ".."
 import { log } from "../logger"
 import { lambdaName, queueName } from "../mapper"
 import { calculateFuncTimeout, logRes, validateConcurrency } from "../util"
+import { getLambdaEnvVars } from "../lambdaHelpers"
 
 const lam = new Lambda()
 const sqs = new SQS()
@@ -24,7 +25,7 @@ const upd = async (id: ConsumerId, con: IConcurrency, to: number) =>
   await logRes(`Updating ${id}`, async () => {
     const ln = lambdaName(id)
     const [vs, qRes] = await Promise.all([
-      getEnvVars(ln),
+      getLambdaEnvVars(ln),
       sqs.getQueueUrl({ QueueName: queueName(id) }).promise(),
       lam
         .putFunctionConcurrency({
@@ -52,10 +53,3 @@ const upd = async (id: ConsumerId, con: IConcurrency, to: number) =>
     ])
     return { arn: lRes.FunctionArn as string }
   })
-
-const getEnvVars = async (ln: string): Promise<EnvironmentVariables> => {
-  const env = (
-    await lam.getFunctionConfiguration({ FunctionName: ln }).promise()
-  ).Environment
-  return env && env.Variables ? env.Variables : {}
-}

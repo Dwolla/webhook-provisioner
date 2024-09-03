@@ -1,19 +1,21 @@
-import Lambda from "aws-sdk/clients/lambda"
+import Lambda, { EnvironmentVariables } from "aws-sdk/clients/lambda"
 import SQS from "aws-sdk/clients/sqs"
 import * as mapper from "../../src/mapper"
+import { getLambdaEnvVars } from "../../src/lambdaHelpers"
 
 jest.mock("aws-sdk/clients/lambda")
 jest.mock("aws-sdk/clients/sqs")
 jest.mock("../../src/mapper")
+jest.mock("../../src/lambdaHelpers")
+const getLambdaEnvVarsMock = jest.mocked(getLambdaEnvVars)
+
 const putFunctionConcurrency = jest.fn()
 const updateFunctionConfiguration = jest.fn()
-const getFunctionConfiguration = jest.fn()
 const getQueueUrl = jest.fn()
 const setQueueAttributes = jest.fn()
 const lam = Lambda as unknown as jest.Mock
 const sqs = SQS as unknown as jest.Mock
 lam.mockImplementationOnce(() => ({
-  getFunctionConfiguration,
   putFunctionConcurrency,
   updateFunctionConfiguration,
 }))
@@ -31,7 +33,7 @@ test("update", async () => {
   const lName = "ln"
   const qName = "qn"
   const qUrl = "qu"
-  const variables = { x: 1 }
+  const variables: EnvironmentVariables = { x: "1" }
   lambdaName.mockReturnValue(lName)
   queueName.mockReturnValue(qName)
   putFunctionConcurrency.mockReturnValue({ promise: () => ({}) })
@@ -41,9 +43,7 @@ test("update", async () => {
   updateFunctionConfiguration.mockReturnValue({
     promise: () => ({ FunctionArn: resourceName }),
   })
-  getFunctionConfiguration.mockReturnValue({
-    promise: () => ({ Environment: { Variables: variables } }),
-  })
+  getLambdaEnvVarsMock.mockResolvedValue(variables)
   setQueueAttributes.mockReturnValue({
     promise: () => ({}),
   })
@@ -56,9 +56,8 @@ test("update", async () => {
     Attributes: { VisibilityTimeout: "192" },
     QueueUrl: qUrl,
   })
-  expect(getFunctionConfiguration).toHaveBeenCalledWith({
-    FunctionName: lName,
-  })
+  expect(getLambdaEnvVarsMock).toHaveBeenCalledWith(lName)
+
   expect(putFunctionConcurrency).toHaveBeenCalledWith({
     FunctionName: lName,
     ReservedConcurrentExecutions: 2,
