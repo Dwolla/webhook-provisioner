@@ -26,7 +26,7 @@ export const latestCode = async (): Promise<Location> =>
 export const codeExists = async (codeVersion: string): Promise<Location> => {
   const listRequest = {
     Bucket: DEPLOYMENT_BUCKET,
-    Prefix: `serverless/webhook-handler/${ENV}/*-${codeVersion}/`,
+    Prefix: `serverless/webhook-handler/${ENV}/${codeVersion}/`,
   }
 
   const contents = await listObjects(listRequest)

@@ -54,9 +54,9 @@ describe("latestCode", () => {
 
 describe("codeExists", () => {
   const bucket = "bucket"
-  const codeVersion = "2024-08-27T16:41:33.184Z"
-  const prefix = `serverless/webhook-handler/test/1549039293184-${codeVersion}/`
-  const prefixMatch = `serverless/webhook-handler/test/*-${codeVersion}/`
+  const codeVersion = "1549039293184-2024-08-27T16:41:33.184Z"
+  const prefix = `serverless/webhook-handler/test/${codeVersion}/`
+  const prefixMatch = `serverless/webhook-handler/test/${codeVersion}/`
 
   test("returns true if code location if it exists", async () => {
     const key = `${prefix}func.zip`
