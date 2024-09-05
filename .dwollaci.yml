@@ -62,3 +62,34 @@ stages:
         npm install -g npm
         npm install -g serverless
         ENVIRONMENT=prod SKRIPTS_DEPLOYMENT_BUCKET=dwolla-encrypted npm run deploy
+
+additionalJobs:
+  - name: UpdateConsumerWebhookHandler
+    nodeLabel: nvm-deployer
+    parameters:
+      - name: Environment
+        type: Choice
+        description: Dwolla environments
+        choices:
+          - devint
+          - uat
+          - prod
+      - name: NodeVersion
+        type: Choice
+        description: supported node versions
+        choices:
+          - nodejs16.x
+          - nodejs20.x
+      - name: CodeName
+        type: String
+        description: Code name to use in handler. Found in s3 deployed code bucket for webhook handler.
+      - name: ConsumerIds
+        type: String
+        description: Comma seperated list of consumer ids. Example '123, "app1", 456, "app2"'
+    steps:
+      - |
+        aws lambda invoke \
+        --region us-west-2 \
+        --function-name webhook-provisioner-${Environment}-updateConsumersCode \
+        --payload '{"consumerIds":[$ConsumerIds],"nodeVersion":"$NodeVersion","codeName":"$CodeName"}' \
+        --output json out.json
