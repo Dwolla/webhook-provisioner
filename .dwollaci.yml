@@ -91,5 +91,5 @@ additionalJobs:
         aws lambda invoke \
         --region us-west-2 \
         --function-name webhook-provisioner-${Environment}-updateConsumersCode \
-        --payload '{"consumerIds":[$ConsumerIds],"nodeVersion":"$NodeVersion","codeName":"$CodeName"}' \
+        --payload '{"consumerIds":['$ConsumerIds'],"nodeVersion":"'"$NodeVersion"'","codeName":"'"$CodeName"'"}' \
         --output json out.json
