@@ -9,7 +9,7 @@ const iam = new IAM()
 export const createRole = async (
   cId: ConsumerId,
   lg: LogGroup,
-  qs: Queues
+  qs: Queues,
 ): Promise<Role> =>
   await logRes<Role>("Creating role and policy", async () => {
     const [rr, pr] = await Promise.all([

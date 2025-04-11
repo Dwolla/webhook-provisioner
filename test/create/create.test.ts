@@ -102,7 +102,7 @@ describe("create", () => {
     expect(createRole).toHaveBeenCalledWith(
       createEvent.consumerId,
       logGroup,
-      queues
+      queues,
     )
     expect(createLambda).toHaveBeenCalledWith({
       cId: createEvent.consumerId,

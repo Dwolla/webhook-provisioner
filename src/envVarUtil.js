@@ -1,0 +1,12 @@
+"use strict"
+Object.defineProperty(exports, "__esModule", { value: true })
+exports.envVarRequired = void 0
+const envVarRequired = (name) => {
+  const envVar = process.env[name]
+  if (envVar) {
+    return envVar
+  }
+  throw new Error(`${name} required`)
+}
+exports.envVarRequired = envVarRequired
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZW52VmFyVXRpbC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImVudlZhclV0aWwudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7O0FBQU8sTUFBTSxjQUFjLEdBQUcsQ0FBQyxJQUFZLEVBQVUsRUFBRTtJQUNyRCxNQUFNLE1BQU0sR0FBRyxPQUFPLENBQUMsR0FBRyxDQUFDLElBQUksQ0FBQyxDQUFBO0lBQ2hDLElBQUksTUFBTSxFQUFFO1FBQ1YsT0FBTyxNQUFNLENBQUE7S0FDZDtJQUNELE1BQU0sSUFBSSxLQUFLLENBQUMsR0FBRyxJQUFJLFdBQVcsQ0FBQyxDQUFBO0FBQ3JDLENBQUMsQ0FBQTtBQU5ZLFFBQUEsY0FBYyxrQkFNMUIiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgY29uc3QgZW52VmFyUmVxdWlyZWQgPSAobmFtZTogc3RyaW5nKTogc3RyaW5nID0+IHtcbiAgY29uc3QgZW52VmFyID0gcHJvY2Vzcy5lbnZbbmFtZV1cbiAgaWYgKGVudlZhcikge1xuICAgIHJldHVybiBlbnZWYXJcbiAgfVxuICB0aHJvdyBuZXcgRXJyb3IoYCR7bmFtZX0gcmVxdWlyZWRgKVxufVxuIl19

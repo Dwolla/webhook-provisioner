@@ -46,7 +46,7 @@ const ENV = envVarRequired("ENVIRONMENT")
 const resourceName = (
   resource: string,
   resourceId?: string,
-  includeRegion = false
+  includeRegion = false,
 ): string =>
   `${PROJECT}${
     typeof resourceId === "undefined" ? "" : `-${resourceId}`
@@ -73,7 +73,7 @@ class MyStack extends Stack {
       { name: "error", metricName: "NumberOfMessagesSent" },
     ].forEach((q) => this.queue(q))
     ;["create", "delete", "disable", "updateCode", "update"].forEach((fn) =>
-      this.lambda(fn)
+      this.lambda(fn),
     )
 
     this.metricAlarm(`LambdaConcurrentExecutionsAlarm`, {
@@ -130,7 +130,7 @@ class MyStack extends Stack {
       const logGroup = logs.LogGroup.fromLogGroupArn(
         this,
         `${capped}LogGroup`,
-        `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`
+        `arn:aws:logs:${REGION}::log-group:/aws/lambda/${name}-${ENV}-${fn}`,
       )
       const filter = new logs.MetricFilter(this, `${ref}ErrorFilter`, {
         logGroup,
@@ -180,7 +180,7 @@ const create = async () => {
   const stack = new MyStack(
     app,
     "Stack",
-    `cloudwatch-alarm-to-slack-topic-${ENV}`
+    `cloudwatch-alarm-to-slack-topic-${ENV}`,
   )
   const stackAspects = Aspects.of(stack)
   stackAspects.add(new Tag("Environment", ENV))

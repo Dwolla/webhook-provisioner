@@ -54,7 +54,7 @@ describe("disable", () => {
     purgeQueue.mockReturnValue({
       promise: () =>
         Promise.reject(
-          new MyError("hi", "AWS.SimpleQueueService.PurgeQueueInProgress")
+          new MyError("hi", "AWS.SimpleQueueService.PurgeQueueInProgress"),
         ),
     })
     listEventSourceMappings.mockReturnValue({

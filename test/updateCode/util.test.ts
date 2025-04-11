@@ -8,7 +8,7 @@ describe("util", () => {
       const expected = new Error("Consumers array is empty or not provided")
 
       expect(() => validateUpdateConsumersCodeRequest(request)).toThrow(
-        expected
+        expected,
       )
     })
 
@@ -19,7 +19,7 @@ describe("util", () => {
       const expected = new Error("Code name is empty or not provided")
 
       expect(() => validateUpdateConsumersCodeRequest(request)).toThrow(
-        expected
+        expected,
       )
     })
 
@@ -31,7 +31,7 @@ describe("util", () => {
       const expected = new Error("Node version is empty or not provided")
 
       expect(() => validateUpdateConsumersCodeRequest(request)).toThrow(
-        expected
+        expected,
       )
     })
 
@@ -44,7 +44,7 @@ describe("util", () => {
       const expected = new Error("Node version is not supported")
 
       expect(() => validateUpdateConsumersCodeRequest(request)).toThrow(
-        expected
+        expected,
       )
     })
 
@@ -62,7 +62,7 @@ describe("util", () => {
       }
 
       expect(validateUpdateConsumersCodeRequest(request)).toStrictEqual(
-        expected
+        expected,
       )
     })
   })

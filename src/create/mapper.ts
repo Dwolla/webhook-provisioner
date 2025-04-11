@@ -53,7 +53,7 @@ interface IAlarmProps {
 export const toCreateQueue = (
   cId: ConsumerId,
   deadLetterTarget: string,
-  funcTimeout: number
+  funcTimeout: number,
 ): CreateQueueRequest => ({
   // Best practice min maxReceiveCount is 5 and VisibilityTimeout is 6x function timeout, https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html
   Attributes: {
@@ -69,14 +69,14 @@ export const toCreateQueue = (
 
 export const toTagQueue = (
   cId: ConsumerId,
-  queueUrl: string
+  queueUrl: string,
 ): TagQueueRequest => ({
   QueueUrl: queueUrl,
   Tags: tags(cId, false) as STags,
 })
 
 export const toGetQueueAttributes = (
-  queueUrl: string
+  queueUrl: string,
 ): GetQueueAttributesRequest => ({
   AttributeNames: ["QueueArn"],
   QueueUrl: queueUrl,
@@ -88,14 +88,14 @@ export const toCreateLogGroup = (cId: ConsumerId): CreateLogGroupRequest => ({
 })
 
 export const toPutRetentionPolicy = (
-  cId: ConsumerId
+  cId: ConsumerId,
 ): PutRetentionPolicyRequest => ({
   logGroupName: logGroupName(cId),
   retentionInDays: 365,
 })
 
 export const toDescribeLogGroups = (
-  cId: ConsumerId
+  cId: ConsumerId,
 ): DescribeLogGroupsRequest => ({
   limit: 1,
   logGroupNamePrefix: logGroupName(cId),
@@ -165,7 +165,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
 
 export const toPutFuncConcurrency = (
   cId: ConsumerId,
-  con: number
+  con: number,
 ): PutFunctionConcurrencyRequest => ({
   FunctionName: lambdaName(cId),
   ReservedConcurrentExecutions: con,
@@ -173,7 +173,7 @@ export const toPutFuncConcurrency = (
 
 export const toCreateEventSourceMapping = (
   cId: ConsumerId,
-  arn: string
+  arn: string,
 ): CreateEventSourceMappingRequest => ({
   BatchSize: BATCH,
   Enabled: true,
@@ -200,7 +200,7 @@ export const toCreateRole = (cId: ConsumerId): CreateRoleRequest => ({
 export const toCreatePolicy = (
   cId: ConsumerId,
   lg: LogGroup,
-  qs: Queues
+  qs: Queues,
 ): CreatePolicyRequest => ({
   PolicyDocument: JSON.stringify({
     Statement: [
@@ -249,7 +249,7 @@ const tags = (cId: ConsumerId, list: boolean): Tags | LTags | STags | ITags => {
 
 const toPutMetricAlarm = (
   topicArn: string,
-  props: IAlarmProps
+  props: IAlarmProps,
 ): PutMetricAlarmInput => ({
   AlarmActions: [topicArn],
   AlarmName: props.alarmName,

@@ -35,7 +35,7 @@ export const codeExists = async (codeVersion: string): Promise<Location> => {
 
   if (filteredObjects.length !== 1) {
     throw new Error(
-      `Unexpected number of code packages returned for code version: ${codeVersion}`
+      `Unexpected number of code packages returned for code version: ${codeVersion}`,
     )
   }
 
@@ -48,7 +48,7 @@ export const codeExists = async (codeVersion: string): Promise<Location> => {
 }
 
 const listObjects = async (
-  request: ListObjectsV2Request
+  request: ListObjectsV2Request,
 ): Promise<S3.ObjectList> => {
   log(`Listing s3 objects for ${request.Bucket}/${request.Prefix}`)
   const result = await s3.listObjectsV2(request).promise()

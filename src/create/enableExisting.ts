@@ -9,11 +9,11 @@ const lam = new Lambda()
 const sqs = new SQS()
 
 export const enableExisting = async (
-  cId: ConsumerId
+  cId: ConsumerId,
 ): Promise<string | undefined> => {
   if (await update(lam, cId, true)) {
     const qr = await ignore404<GetQueueUrlResult>(() =>
-      sqs.getQueueUrl({ QueueName: queueName(cId) }).promise()
+      sqs.getQueueUrl({ QueueName: queueName(cId) }).promise(),
     )
     return qr && qr.QueueUrl
   }

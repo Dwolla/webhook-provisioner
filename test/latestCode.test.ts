@@ -30,7 +30,7 @@ describe("latestCode", () => {
       promise: () => ({ Contents: [{ Key: "" }] }),
     })
     await expect(latestCode()).rejects.toEqual(
-      new Error(`Filtered s3 list returned 0 matches`)
+      new Error(`Filtered s3 list returned 0 matches`),
     )
   })
 
@@ -94,7 +94,7 @@ describe("codeExists", () => {
 
   test("throw an error if multiple filtered objects are returned", async () => {
     const expected = new Error(
-      `Unexpected number of code packages returned for code version: ${codeVersion}`
+      `Unexpected number of code packages returned for code version: ${codeVersion}`,
     )
 
     listObjectsV2.mockReturnValue({

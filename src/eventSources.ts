@@ -23,8 +23,8 @@ export const exec = async (
   cId: ConsumerId,
   fn: (
     uuid: string,
-    state?: string
-  ) => Promise<EventSourceMappingConfiguration | string>
+    state?: string,
+  ) => Promise<EventSourceMappingConfiguration | string>,
 ): Promise<boolean> => {
   const es = await getEventSources(lam, cId)
   for (const e of es) {

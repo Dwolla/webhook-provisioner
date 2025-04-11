@@ -82,7 +82,7 @@ describe("mapper", () => {
       when(queueName).calledWith(APPLICATION_ID).mockReturnValue(qn)
 
       expect(
-        toCreateQueue(APPLICATION_ID, dlqArn, FUNCTION_TIMEOUT_SEC)
+        toCreateQueue(APPLICATION_ID, dlqArn, FUNCTION_TIMEOUT_SEC),
       ).toEqual({
         Attributes: {
           MessageRetentionPeriod: "1209600",

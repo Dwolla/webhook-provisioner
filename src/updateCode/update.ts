@@ -32,19 +32,19 @@ const REJECTED = "rejected"
 
 const throttled = throttle(
   async (func: Fn, code: Location, runtime?: string) =>
-    await update(func, code, runtime)
+    await update(func, code, runtime),
 )
 
 export const updateAll = async (): Promise<IFunc[]> => {
   const [lc, fns] = await Promise.all([latestCode(), allFunctions()])
   const [upd, notUpd] = partition(
     fns,
-    (f) => toEpoch(f.vars.VERSION) < toEpoch(lc.version)
+    (f) => toEpoch(f.vars.VERSION) < toEpoch(lc.version),
   )
   logFunctionsNotUpdates(notUpd)
 
   const results = await Promise.allSettled(
-    upd.map(async (f) => await throttled(f, lc))
+    upd.map(async (f) => await throttled(f, lc)),
   )
   logResults(results)
 
@@ -55,22 +55,22 @@ export const updateAll = async (): Promise<IFunc[]> => {
 }
 
 export const updateByConsumerIds = async (
-  request: UpdateConsumersCodeRequest
+  request: UpdateConsumersCodeRequest,
 ): Promise<UpdateConsumersCodeResponse> => {
   const codeVersion = await codeExists(request.codeName)
   const lambdas = await Promise.all(request.consumerIds.map(getLambdaDetails))
 
   const [updateLambdas, upToDateLambdas] = partition(
     lambdas,
-    (f) => toEpoch(f.vars.VERSION) != toEpoch(codeVersion.version)
+    (f) => toEpoch(f.vars.VERSION) != toEpoch(codeVersion.version),
   )
 
   logFunctionsNotUpdates(upToDateLambdas)
 
   const results = await Promise.allSettled(
     updateLambdas.map(
-      async (f) => await throttled(f, codeVersion, request.nodeVersion)
-    )
+      async (f) => await throttled(f, codeVersion, request.nodeVersion),
+    ),
   )
   logResults(results)
 
@@ -108,7 +108,7 @@ const allFunctions = async (): Promise<Fn[]> => {
           f.FunctionName &&
           webhookPattern.test(f.FunctionName) &&
           f.Environment &&
-          f.Environment.Variables
+          f.Environment.Variables,
       )
       .map((f) => ({
         name: f.FunctionName as string,
@@ -123,14 +123,14 @@ const toEpoch = (s: string): number => new Date(s).getTime()
 function partition<T>(as: T[], pred: (a: T) => boolean) {
   return as.reduce(
     ([x, y], a): Partition<T> => (pred(a) ? [[...x, a], y] : [x, [...y, a]]),
-    [[], []] as Partition<T>
+    [[], []] as Partition<T>,
   )
 }
 
 const update = async (
   f: Fn,
   lc: Location,
-  runtime = "nodejs20.x"
+  runtime = "nodejs20.x",
 ): Promise<IFunc> =>
   await logRes(`Updating ${f.name}`, async () => {
     await lambdaClient
@@ -170,7 +170,7 @@ const logResults = (results: PromiseSettledResult<IFunc>[]) => {
       log(
         `Update successful for lambdaName=${
           (res as PromiseFulfilledResult<IFunc>).value.name
-        }`
+        }`,
       )
     }
   })
@@ -179,6 +179,6 @@ const logResults = (results: PromiseSettledResult<IFunc>[]) => {
 const logFunctionsNotUpdates = (notUpdating: Fn[]) =>
   notUpdating.forEach((lambda) =>
     log(
-      `Lambda running the current version. No updates required name=${lambda.name}`
-    )
+      `Lambda running the current version. No updates required name=${lambda.name}`,
+    ),
   )

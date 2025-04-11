@@ -59,7 +59,7 @@ test("createLambda", async () => {
   expect(putFunctionConcurrency).toHaveBeenCalledWith(concurrencyRequest)
   expect(toCreateEventSourceMapping).toHaveBeenCalledWith(
     createRequest.cId,
-    createRequest.queues.partner.arn
+    createRequest.queues.partner.arn,
   )
   expect(createEventSourceMapping).toHaveBeenCalledWith(eventSourceMapping)
 })

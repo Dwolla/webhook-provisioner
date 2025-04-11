@@ -32,7 +32,7 @@ export const calculateMaxRetries = () => {
 }
 
 export async function ignore404<T>(
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T | undefined> {
   const is404 = (c: string) =>
     c &&
@@ -69,12 +69,12 @@ export async function retry<T>(fn: () => Promise<T>): Promise<T> {
       }
     },
     // Terraform handles this similarly, https://github.com/hashicorp/terraform/pull/4316/files
-    { maxTimeout: 5000, minTimeout: 5000, retries: 15 }
+    { maxTimeout: 5000, minTimeout: 5000, retries: 15 },
   )
 }
 
 export const withErrHandling = async (
-  bodyFunc: () => Promise<object>
+  bodyFunc: () => Promise<object>,
 ): Promise<Res> => {
   try {
     return toRes(await bodyFunc())

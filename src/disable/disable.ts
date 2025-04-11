@@ -20,7 +20,7 @@ export const disable = async (evt: IDisableEvent): Promise<void> => {
 const purge = async (cId: ConsumerId) => {
   const qName = queueName(cId)
   const qr = await ignore404<GetQueueUrlResult>(() =>
-    sqs.getQueueUrl({ QueueName: qName }).promise()
+    sqs.getQueueUrl({ QueueName: qName }).promise(),
   )
 
   if (qr) {

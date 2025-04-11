@@ -34,7 +34,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
         filterName: fName,
         logGroupName: lgName,
       })
-      .promise()
+      .promise(),
   )
 
   log(`Deleting log group ${lgName}`)
@@ -51,7 +51,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
   await exec(lam, cId, async (uuid: string, state?: string) =>
     state && state === "Deleting"
       ? (state as string)
-      : await lam.deleteEventSourceMapping({ UUID: uuid }).promise()
+      : await lam.deleteEventSourceMapping({ UUID: uuid }).promise(),
   )
 
   const lName = lambdaName(cId)
@@ -61,7 +61,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
   const qName = queueName(cId)
   log(`Deleting queue ${qName}`)
   const qr = await ignore404<GetQueueUrlResult>(() =>
-    sqs.getQueueUrl({ QueueName: qName }).promise()
+    sqs.getQueueUrl({ QueueName: qName }).promise(),
   )
   if (qr) await sqs.deleteQueue({ QueueUrl: qr.QueueUrl as string }).promise()
 
@@ -71,7 +71,7 @@ export const del = async (cId: ConsumerId): Promise<void> => {
     const pa = rr.Role.Arn.replace(/role/g, "policy")
     log(`Detaching ${rn} from ${pa}`)
     await ignore404(() =>
-      iam.detachRolePolicy({ RoleName: rn, PolicyArn: pa }).promise()
+      iam.detachRolePolicy({ RoleName: rn, PolicyArn: pa }).promise(),
     )
     log(`Deleting ${pa}`)
     await ignore404(() => iam.deletePolicy({ PolicyArn: pa }).promise())

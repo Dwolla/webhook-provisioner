@@ -15,7 +15,7 @@ export const update = async (evt: IUpdateEvent): Promise<IFunc[]> => {
   const con = validateConcurrency(evt.concurrency)
   const to = calculateFuncTimeout(con.post)
   const res = await Promise.all(
-    evt.consumerIds.map((id) => limit<any, IFunc>(() => upd(id, con, to)))
+    evt.consumerIds.map((id) => limit<any, IFunc>(() => upd(id, con, to))),
   )
   log("Complete")
   return res

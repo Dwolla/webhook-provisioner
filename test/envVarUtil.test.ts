@@ -5,6 +5,6 @@ describe("envVarRequired", () => {
     expect(envVarRequired("ENVIRONMENT")).toBe("test"))
   it("throw error if environment value does not exists", () =>
     expect(() => envVarRequired("EmptyVar")).toThrow(
-      new Error(`EmptyVar required`)
+      new Error(`EmptyVar required`),
     ))
 })

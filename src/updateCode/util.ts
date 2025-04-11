@@ -1,7 +1,7 @@
 import { UpdateConsumersCodeRequest } from "../index"
 
 const validateUpdateConsumersCodeRequest = (
-  request: UpdateConsumersCodeRequest
+  request: UpdateConsumersCodeRequest,
 ): UpdateConsumersCodeRequest => {
   if (!Array.isArray(request.consumerIds) || request.consumerIds.length === 0) {
     throw new Error("Consumers array is empty or not provided")

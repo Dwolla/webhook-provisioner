@@ -24,7 +24,7 @@ const writeRes = (body: object, res: ServerResponse): void => {
 
 const requestHandler = async (
   req: IncomingMessage,
-  res: ServerResponse
+  res: ServerResponse,
 ): Promise<void> => {
   const url = req.url || "/"
   if (req.method === "POST") {
@@ -41,26 +41,26 @@ const requestHandler = async (
       consumerIds: [12345, 456],
     },
     url,
-    res
+    res,
   )
 }
 
 const handleReq = async (
   evt: IConcurrencyEvent | IUpdateEvent,
   url: string,
-  res: ServerResponse
+  res: ServerResponse,
 ): Promise<void> => {
   try {
     if (url === "/") {
       return writeRes(
         {
           body: `Visit ${FUNCS.map((f) => f.path).join(
-            ", "
+            ", ",
           )} to invoke the corresponding Lambda function. POST an event or use the default specified in server.ts with a GET.`,
           event: evt,
           statusCode: 200,
         },
-        res
+        res,
       )
     }
     const func = FUNCS.find((f) => f.path === url)
@@ -68,7 +68,7 @@ const handleReq = async (
       func
         ? await func.fn(evt as any)
         : { statusCode: 400, body: "Path not found." },
-      res
+      res,
     )
   } catch (e: any) {
     error("handle err", e)
@@ -77,5 +77,5 @@ const handleReq = async (
 }
 
 createServer(requestHandler).listen(PORT, () =>
-  log(`Listening at localhost:${PORT}...`)
+  log(`Listening at localhost:${PORT}...`),
 )

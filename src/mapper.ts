@@ -41,7 +41,7 @@ export const topicName = () => `cloudwatch-alarm-to-slack-topic-${ENV}`
 const resourceName = (
   resource: string,
   resourceId?: ConsumerId,
-  includeRegion = false
+  includeRegion = false,
 ): string =>
   `${PROJECT}${
     typeof resourceId === "undefined" ? "" : `-${resourceId}`

@@ -16,7 +16,7 @@ jest.mock("../../src/updateCode/util")
 const updateAllMock = jest.mocked(updateAll)
 const updateByConsumerIdsMock = jest.mocked(updateByConsumerIds)
 const validateUpdateConsumersCodeRequestMock = jest.mocked(
-  validateUpdateConsumersCodeRequest
+  validateUpdateConsumersCodeRequest,
 )
 
 describe("handler", () => {
@@ -107,7 +107,7 @@ describe("updateByConsumersCodeHandler", () => {
     const results = await updateConsumersCodeHandler(
       request,
       context,
-      jest.fn()
+      jest.fn(),
     )
 
     expect(results).toEqual(expected)
@@ -133,7 +133,7 @@ describe("updateByConsumersCodeHandler", () => {
     const results = await updateConsumersCodeHandler(
       request,
       context,
-      jest.fn()
+      jest.fn(),
     )
 
     expect(results).toEqual(expected)
@@ -144,7 +144,7 @@ describe("updateByConsumersCodeHandler", () => {
     const results = await updateConsumersCodeHandler(
       request,
       context,
-      jest.fn()
+      jest.fn(),
     )
 
     expect(results).toEqual(successResponse)

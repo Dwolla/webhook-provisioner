@@ -17,7 +17,7 @@ export const handle = async (): Promise<Res> =>
   })
 
 export const updateConsumersCodeHandler: UpdateConsumersCodeHandler = async (
-  request: UpdateConsumersCodeRequest
+  request: UpdateConsumersCodeRequest,
 ): Promise<UpdateConsumersCodeResponse> => {
   try {
     log("Request received", request)
@@ -25,7 +25,7 @@ export const updateConsumersCodeHandler: UpdateConsumersCodeHandler = async (
     return updateByConsumerIds(validRequest)
   } catch (e: any) {
     error(
-      `Error returned during processing handling, errorMessage=${e.message}`
+      `Error returned during processing handling, errorMessage=${e.message}`,
     )
     return {
       statusCode: 500,

@@ -38,17 +38,17 @@ describe("ignore404", () => {
 
   it("ignores ResourceNotFoundException", async () =>
     await expect(
-      ignore404(() => reject("ResourceNotFoundException"))
+      ignore404(() => reject("ResourceNotFoundException")),
     ).resolves.toEqual(undefined))
 
   it("ignores NoSuchEntity", async () =>
     await expect(ignore404(() => reject("NoSuchEntity"))).resolves.toEqual(
-      undefined
+      undefined,
     ))
 
   it("ignores NonExistentQueue", async () =>
     await expect(
-      ignore404(() => reject("AWS.SimpleQueueService.NonExistentQueue"))
+      ignore404(() => reject("AWS.SimpleQueueService.NonExistentQueue")),
     ).resolves.toEqual(undefined))
 
   it("throws unexpected code", async () => {
@@ -67,7 +67,7 @@ describe("withErrHandling", () => {
     const exp = { res: "my-res" }
 
     await expect(
-      withErrHandling(async () => await Promise.resolve(exp))
+      withErrHandling(async () => await Promise.resolve(exp)),
     ).resolves.toEqual({
       body: JSON.stringify(exp),
       statusCode: 200,
@@ -78,7 +78,7 @@ describe("withErrHandling", () => {
     const err = "my-error"
 
     await expect(
-      withErrHandling(async () => await Promise.reject(new Error(err)))
+      withErrHandling(async () => await Promise.reject(new Error(err))),
     ).resolves.toEqual({
       body: JSON.stringify({ error: err }),
       statusCode: 500,
@@ -87,7 +87,7 @@ describe("withErrHandling", () => {
 
   it("returns unexpected error if no message", async () => {
     await expect(
-      withErrHandling(async () => await Promise.reject(new Error()))
+      withErrHandling(async () => await Promise.reject(new Error())),
     ).resolves.toEqual({
       body: JSON.stringify({ error: "Unexpected error." }),
       statusCode: 500,

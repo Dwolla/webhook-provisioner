@@ -9,7 +9,7 @@ const sqs = new SQS()
 
 export const createQueue = async (
   cId: ConsumerId,
-  funcTimeout: number
+  funcTimeout: number,
 ): Promise<Queues> =>
   await logRes<Queues>("Creating queue", async () => {
     const [rr, er] = await Promise.all([
