@@ -130,7 +130,7 @@ function partition<T>(as: T[], pred: (a: T) => boolean) {
 const update = async (
   f: Fn,
   lc: Location,
-  runtime = "nodejs20.x"
+  runtime = "nodejs24.x"
 ): Promise<IFunc> =>
   await logRes(`Updating ${f.name}`, async () => {
     await lambdaClient

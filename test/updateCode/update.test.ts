@@ -133,7 +133,7 @@ test("update", async () => {
     },
     FunctionName: functionName,
     MemorySize: 128,
-    Runtime: "nodejs20.x",
+    Runtime: "nodejs24.x",
     Timeout: 32,
   })
   expect(updateFunctionConfiguration).toHaveBeenCalledWith({
@@ -145,7 +145,7 @@ test("update", async () => {
     },
     FunctionName: stringFunctionName,
     MemorySize: 128,
-    Runtime: "nodejs20.x",
+    Runtime: "nodejs24.x",
     Timeout: 32,
   })
 })
@@ -158,7 +158,7 @@ describe("updateByConsumerIds", () => {
   const codeName = "2024-08-27T16:41:33.184Z"
   const request: UpdateConsumersCodeRequest = {
     codeName: codeName,
-    nodeVersion: "nodejs20.x",
+    nodeVersion: "nodejs24.x",
     consumerIds: [1, "app2"],
   }
 

@@ -39,7 +39,7 @@ describe("util", () => {
       const request = {
         consumerIds: [123, "app1"],
         codeName: "testName",
-        nodeVersion: "nodejs18.x",
+        nodeVersion: "nodejs16.x",
       } as UpdateConsumersCodeRequest
       const expected = new Error("Node version is not supported")
 
@@ -52,13 +52,13 @@ describe("util", () => {
       const request = {
         consumerIds: [123, "app1"],
         codeName: "testName ",
-        nodeVersion: "nodejs20.x ",
+        nodeVersion: "nodejs24.x ",
       }
 
       const expected = {
         consumerIds: [123, "app1"],
         codeName: "testName",
-        nodeVersion: "nodejs20.x",
+        nodeVersion: "nodejs24.x",
       }
 
       expect(validateUpdateConsumersCodeRequest(request)).toStrictEqual(

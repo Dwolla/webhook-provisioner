@@ -15,7 +15,7 @@ const validateUpdateConsumersCodeRequest = (
     throw new Error("Node version is empty or not provided")
   }
 
-  const validNodeVersions = ["nodejs16.x", "nodejs20.x"]
+  const validNodeVersions = ["nodejs20.x", "nodejs24.x"]
   if (!validNodeVersions.includes(request.nodeVersion.trim())) {
     throw new Error("Node version is not supported")
   }
