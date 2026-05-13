@@ -266,7 +266,7 @@ describe("mapper", () => {
       MemorySize: 128,
       Publish: true,
       Role: req.role.roleArn,
-      Runtime: "nodejs20.x",
+      Runtime: "nodejs24.x",
       Tags: CONSUMER_TAGS,
       Timeout: req.timeout,
     })

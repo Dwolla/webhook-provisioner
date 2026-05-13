@@ -1,6 +1,7 @@
 .DS_Store
 event.json
 scripts/*.js
+src/**/*.js
 stack.yml
 
 .idea/

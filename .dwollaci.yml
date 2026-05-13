@@ -78,8 +78,8 @@ additionalJobs:
         type: Choice
         description: supported node versions
         choices:
-          - nodejs16.x
           - nodejs20.x
+          - nodejs24.x
       - name: CodeName
         type: String
         description: Code name to use in handler. Found in s3 deployed code bucket for webhook handler.

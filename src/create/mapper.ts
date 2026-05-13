@@ -158,7 +158,7 @@ export const toCreateFunc = (req: CreateFuncReq): CreateFunctionRequest => ({
   MemorySize: 128,
   Publish: true,
   Role: req.role.roleArn,
-  Runtime: "nodejs20.x",
+  Runtime: "nodejs24.x",
   Tags: tags(req.cId, false) as LTags,
   Timeout: req.timeout,
 })
@@ -236,7 +236,7 @@ export const toCreatePolicy = (
 })
 
 const tags = (cId: ConsumerId, list: boolean): Tags | LTags | STags | ITags => {
-  const t: any = {
+  const t: Record<string, string> = {
     ConsumerId: cId.toString(),
     Creator: name,
     Environment: ENV,
