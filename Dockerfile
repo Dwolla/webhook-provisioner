@@ -1,4 +1,4 @@
-FROM node:10.15-alpine
+FROM node:10.23.3-alpine
 LABEL maintainer="Dwolla Engineering <dev+webhook-provisioner@dwolla.com>"
 
 ENV ENVIRONMENT local
